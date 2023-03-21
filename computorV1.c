@@ -37,20 +37,29 @@ int ft_error(int res){
 }
 
 int isGoodCharacter(char c){
-    if ((c >= 45 && c <= 57) || c == 32 || c == 88 || (c >= 40 && c <= 43) || c == 94 || c == 61){
+    if ((c >= 45 && c <= 57) || c == 32 || c == 88 || (c >= 42 && c <= 43) || c == 94 || c == 61){
         return (1);
     }
     return (0);
 }
 
-int (char *equation, int len, t_data **beginList){
-    t_data  *new = NULL;
-    if ((new = malloc(sizeof(t_data))) == NULL)
-        return (-1);
-    for (; equation[len] != '\0'; len++){
-        
+int saveOneBlockNumber(char *equation, int *len t_data **beginList, int side){
+
+}
+
+int saveData(t_data **beginList, char *equation){
+    int side = 0;
+    for (int i = 0; equation[i] != '\0'; i++){
+        if (equation[i] == 61)
+            side++;
+        else if (equation[i] >= 48 && equation[i] <= 57)
+            saveOneBlockNumber(equation + i, &i, beginList, side);
+        // if (equation[i] == 42 || equation[i] == 43 || equation[i] == 45 || equation[i] == 47)
+        //     saveOneBlockSign(equation + i, beginList);
+        // if (eqution[i] == 88)
+        //     saveOneBlockPower(equation + i, beginList);
     }
-    return len;
+    return (0);
 }
 
 
@@ -62,7 +71,9 @@ int computorV1(char *equation){
         if (isGoodCharacter(equation[i]) == 0){
             return (1);
         }
-        i = saveData(equation + i, i, &data);
+    }
+    if (saveData(&data, equation) != 0){
+        // clear data et return value error
     }
     return (0);
 }

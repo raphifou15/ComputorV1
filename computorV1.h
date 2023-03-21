@@ -8,12 +8,24 @@
 #define INT_MAX 2147483647
 #define INT_MIN -2147483648
 
+#define POWER 1
+#define NUMBER 2
+#define SIGN 3
+
+
+// typedef struct s_data{
+//         double  power;
+//         double  mulFactor;
+//         bool    side;
+//         char    actNext;
+//         s_data  *next;
+// }       t_data;
+
 typedef struct s_data{
-        double  power;
-        double  mulFactor;
-        bool    side;
-        char    actNext;
-        s_data  *next;
+        double  value;
+        int     type;
+        int     side;
 }       t_data;
+
 
 #endif
