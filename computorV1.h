@@ -12,6 +12,8 @@
 #define NUMBER 2
 #define SIGN 3
 
+#define LEFT 0
+#define right 1
 
 // typedef struct s_data{
 //         double  power;

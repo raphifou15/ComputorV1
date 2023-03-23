@@ -43,8 +43,27 @@ int isGoodCharacter(char c){
     return (0);
 }
 
-int saveOneBlockNumber(char *equation, int *len t_data **beginList, int side){
-
+int saveOneBlockNumber(char *equation, int *len, t_data **beginList, int side){
+    int type = NUMBER;
+    double num = 0;
+    int sup = 0;
+    int div = 10;
+    (void)div; (void)type; (void)beginList; (void)side;
+    for (int i = 0; equation[i] != '\0' && (((equation[i] >= '0' && equation[i] <= '9') || (equation[i] == '.'))); i++){
+        if (equation[i] == '.')
+            sup++;
+        else if (sup == 0){
+            num *= 10;
+            num += equation[i] - 48;
+        }
+        else if (sup == 1){
+            num += (double)((double)(equation[i] - 48) / (double)div);
+            div *= 10;
+        }
+        *len = *len + 1;
+    }
+    printf("num = %f\n", num);
+    return 0;
 }
 
 int saveData(t_data **beginList, char *equation){
