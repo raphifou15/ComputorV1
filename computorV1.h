@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 #define INT_MAX 2147483647
 #define INT_MIN -2147483648
@@ -13,7 +14,7 @@
 #define SIGN 3
 
 #define LEFT 0
-#define right 1
+#define RIGHT 1
 
 // typedef struct s_data{
 //         double  power;
@@ -23,11 +24,15 @@
 //         s_data  *next;
 // }       t_data;
 
-typedef struct s_data{
-        double  value;
-        int     type;
-        int     side;
-}       t_data;
+// typedef struct s_data{
+//         double  value;
+//         int     type;
+//         int     side;
+// }       t_data;
 
+typedef struct s_data{
+        double  factor;
+        double  power;
+}       t_data;
 
 #endif

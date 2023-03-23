@@ -16,8 +16,6 @@
 
 #include "computorV1.h"
 
-
-
 int ft_strcmp(char *s1, char *s2){
     if (s1 == NULL || s2 == NULL)
         return (s1 - s2);
@@ -43,47 +41,18 @@ int isGoodCharacter(char c){
     return (0);
 }
 
-int saveOneBlockNumber(char *equation, int *len, t_data **beginList, int side){
-    int type = NUMBER;
-    double num = 0;
-    int sup = 0;
-    int div = 10;
-    (void)div; (void)type; (void)beginList; (void)side;
-    for (int i = 0; equation[i] != '\0' && (((equation[i] >= '0' && equation[i] <= '9') || (equation[i] == '.'))); i++){
-        if (equation[i] == '.')
-            sup++;
-        else if (sup == 0){
-            num *= 10;
-            num += equation[i] - 48;
-        }
-        else if (sup == 1){
-            num += (double)((double)(equation[i] - 48) / (double)div);
-            div *= 10;
-        }
-        *len = *len + 1;
-    }
-    printf("num = %f\n", num);
+int parseData(char *equation, t_data **left, t_data **right){
+    (void)equation; (void)left; (void)right;
+    // ici il faudra recuperer les donner une a une 
+    // si une seul donner n'ai pas correctement ecrit renvoyer une erreur.
+    // parcourir la string equation et renplir au fur et a mesur les donner dans une data.
     return 0;
 }
 
-int saveData(t_data **beginList, char *equation){
-    int side = 0;
-    for (int i = 0; equation[i] != '\0'; i++){
-        if (equation[i] == 61)
-            side++;
-        else if (equation[i] >= 48 && equation[i] <= 57)
-            saveOneBlockNumber(equation + i, &i, beginList, side);
-        // if (equation[i] == 42 || equation[i] == 43 || equation[i] == 45 || equation[i] == 47)
-        //     saveOneBlockSign(equation + i, beginList);
-        // if (eqution[i] == 88)
-        //     saveOneBlockPower(equation + i, beginList);
-    }
-    return (0);
-}
-
-
 int computorV1(char *equation){
-    t_data  *data = NULL;
+    t_data  *dataLeft = NULL;
+    t_data  *dataRight = NULL;
+    int     res = 0;
 
     printf("equation = %s\n", equation);
     for (int i = 0; equation[i] != '\0'; i++){
@@ -91,9 +60,8 @@ int computorV1(char *equation){
             return (1);
         }
     }
-    if (saveData(&data, equation) != 0){
-        // clear data et return value error
-    }
+    if ((res = parseData(equation,&dataLeft, &dataRight)) != 0)
+        return (res);
     return (0);
 }
 
@@ -109,3 +77,52 @@ int main(int argc, char *argv[]){
         return (ft_error(res));
     return (0);
 }
+
+
+
+
+
+// int saveData(t_data **beginList, char *equation){
+//     int side = 0;
+//     for (int i = 0; equation[i] != '\0'; i++){
+//         if (equation[i] == 61)
+//             side++;
+//         else if (equation[i] >= 48 && equation[i] <= 57)
+//             saveOneBlockNumber(equation + i, &i, beginList, side);
+//         // if (equation[i] == 42 || equation[i] == 43 || equation[i] == 45 || equation[i] == 47)
+//         //     saveOneBlockSign(equation + i, beginList);
+//         // if (eqution[i] == 88)
+//         //     saveOneBlockPower(equation + i, beginList);
+//     }
+//     return (0);
+// }
+
+// int saveOneBlockNumber(char *equation, int *len, t_data **beginList, int side){
+//     int type = NUMBER;
+//     double num = 0;
+//     int sup = 0;
+//     int div = 10;
+//     (void)div; (void)type; (void)beginList; (void)side;
+//     for (int i = 0; equation[i] != '\0' && (((equation[i] >= '0' && equation[i] <= '9') || (equation[i] == '.'))); i++){
+//         if (equation[i] == '.')
+//             sup++;
+//         else if (sup == 0){
+//             num *= 10;
+//             num += equation[i] - 48;
+//         }
+//         else if (sup == 1){
+//             num += (double)((double)(equation[i] - 48) / (double)div);
+//             div *= 10;
+//         }
+//         *len = *len + 1;
+//     }
+//     printf("num = %f\n", num);
+//     return 0;
+// }
+
+// void    print_float(double nb, int fd){
+//     if (nb < 0){
+//         nb *= -1;
+//         write('-')
+//     }
+// }
