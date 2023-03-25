@@ -41,26 +41,83 @@ int isGoodCharacter(char c){
     return (0);
 }
 
-int parseData(char *equation, t_data **left, t_data **right){
-    (void)equation; (void)left; (void)right;
-    // ici il faudra recuperer les donner une a une 
-    // si une seul donner n'ai pas correctement ecrit renvoyer une erreur.
-    // parcourir la string equation et renplir au fur et a mesur les donner dans une data.
+char *  insertValueFromEquation(char *equation){
+    int len = 0;
+    char *val;
+    while (equation[len] != '\0' && equation[len] != 32){
+        len++;
+    }
+    if ((val = (char *)(malloc(sizeof(char) * (len + 1)))) == NULL)
+        return NULL;
+    for (int i = 0; i < len; i++){
+        val[i] = equation[i];
+    }
+    val[len] = '\0';
+    return val;
+}
+
+int isDouble(char *val){
+    int point = 0;
+    for (int i = 0; equation[i] != '\0'; i++){
+        if (equation[i] == '.')
+            point++;
+        if (i == 0 && equation[i] == '.')
+            return 0;
+        if ((equation[i] < 48 || equation[i] > 57) && equation[i] == '.'){
+            return 0;
+        }
+    }
+    if (point > 1)
+        return 0;
+    return 1;
+}
+
+int findType(char *val, int len){
+    if (len == 1){
+        if (val[0] == '+') return ADD;
+        else if (val[0] == '-') return SOUS;
+        else if (val[0] == '/') return DIV
+        else if (val[0] == '*') return MULT;
+        else if (val[0] == '=') return EQ;
+    }
+
+
+}
+
+void    saveData(char *equation, int *len, t_data **beginList){
+    (void)beginList;
+    int  type = 0;
+    int lenVal = 0;
+    char *val = NULL;
+    val = insertValueFromEquation(equation);
+    lenVal = strlen(val);
+    type = findType(val, lenVal);
+    printf("val = %s\n",val);
+    *len += lenVal -1;
+    free(val);
+}
+
+int parseData(char *equation, t_data **data){
+    (void)data;
+    for (int i = 0; equation[i] != '\0'; i++){
+        if (equation[i] == 32) continue;
+        saveData(equation + i, &i, data);
+    }
     return 0;
 }
 
+
 int computorV1(char *equation){
-    t_data  *dataLeft = NULL;
-    t_data  *dataRight = NULL;
+    t_data  *data = NULL;
     int     res = 0;
 
-    printf("equation = %s\n", equation);
+    printf("equation : %s\n", equation);
     for (int i = 0; equation[i] != '\0'; i++){
         if (isGoodCharacter(equation[i]) == 0){
             return (1);
         }
     }
-    if ((res = parseData(equation,&dataLeft, &dataRight)) != 0)
+    if ((res = parseData(equation,&data)) != 0)
         return (res);
     return (0);
 }
@@ -124,5 +181,34 @@ int main(int argc, char *argv[]){
 //     if (nb < 0){
 //         nb *= -1;
 //         write('-')
+//     }
+// }
+
+
+// int parseData(char *equation, t_data **left, t_data **right){
+//     int side = 0;
+//     (void)equation; (void)left; (void)right;
+//     for (int i = 0; equation[i] != '\0'; i++){
+//         if (equation[i] == '=')
+//             side++;
+//         else if (side == 0){
+//             saveData(left, equation + i, &i);
+//         }
+//     }
+//     // ici il faudra recuperer les donner une a une 
+//     // si une seul donner n'ai pas correctement ecrit renvoyer une erreur.
+//     // parcourir la string equation et renplir au fur et a mesur les donner dans une data.
+//     return 0;
+// }
+
+// void    saveData(t_data **BeginList, char *equation, int *len){
+//     (void)BeginList;
+//     double power = 0;
+//     double factor = 0;
+//     printf("equation = %s\n", equation);
+//     for (int i = 0; equation[i] != '\0'; i++){
+//         if (equation[i] == 32) continue;
+//         else if ()
+//         *len = *len + 1;
 //     }
 // }
