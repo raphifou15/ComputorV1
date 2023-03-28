@@ -58,12 +58,12 @@ char *  insertValueFromEquation(char *equation){
 
 int isDouble(char *val){
     int point = 0;
-    for (int i = 0; equation[i] != '\0'; i++){
-        if (equation[i] == '.')
+    for (int i = 0; val[i] != '\0'; i++){
+        if (val[i] == '.')
             point++;
-        if (i == 0 && equation[i] == '.')
+        if (i == 0 && val[i] == '.')
             return 0;
-        if ((equation[i] < 48 || equation[i] > 57) && equation[i] == '.'){
+        if ((val[i] < 48 || val[i] > 57) && val[i] != '.'){
             return 0;
         }
     }
@@ -76,32 +76,39 @@ int findType(char *val, int len){
     if (len == 1){
         if (val[0] == '+') return ADD;
         else if (val[0] == '-') return SOUS;
-        else if (val[0] == '/') return DIV
+        else if (val[0] == '/') return DIV;
         else if (val[0] == '*') return MULT;
         else if (val[0] == '=') return EQ;
     }
-
-
+    if (isDouble(val) == 1) return FACTOR;
+    if (val[0] == 'X' && val[1] == '^' && isDouble(val + 2) == 1) return POWER;
+    return WRONG;
 }
 
-void    saveData(char *equation, int *len, t_data **beginList){
+void    saveData(char *equation, int *len, t_data **beginList, int *side){
     (void)beginList;
     int  type = 0;
     int lenVal = 0;
+    double value = 0;
     char *val = NULL;
+
     val = insertValueFromEquation(equation);
     lenVal = strlen(val);
     type = findType(val, lenVal);
-    printf("val = %s\n",val);
+    if (type == EQ)
+        *side = RIGHT;
+    printf("side = %d type = %d val = %s\n",*side, type, val);
     *len += lenVal -1;
     free(val);
 }
 
 int parseData(char *equation, t_data **data){
     (void)data;
+    int side = LEFT;
+
     for (int i = 0; equation[i] != '\0'; i++){
         if (equation[i] == 32) continue;
-        saveData(equation + i, &i, data);
+        saveData(equation + i, &i, data, &side);
     }
     return 0;
 }
@@ -117,7 +124,7 @@ int computorV1(char *equation){
             return (1);
         }
     }
-    if ((res = parseData(equation,&data)) != 0)
+    if ((res = parseData(equation, &data)) != 0)
         return (res);
     return (0);
 }
