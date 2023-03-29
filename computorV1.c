@@ -85,21 +85,73 @@ int findType(char *val, int len){
     return WRONG;
 }
 
-void    saveData(char *equation, int *len, t_data **beginList, int *side){
-    (void)beginList;
-    int  type = 0;
-    int lenVal = 0;
-    double value = 0;
-    char *val = NULL;
+double  toDouble(char *val){
+    double  nb = 0;
+    int     point = 0;
+    double  div = 10;
 
-    val = insertValueFromEquation(equation);
-    lenVal = strlen(val);
-    type = findType(val, lenVal);
-    if (type == EQ)
+    if (val == NULL || val[0] == '.')
+        return -1;
+    for (int i = 0; val[i] != '\0'; i++){
+        if (val[i] == '.')
+            point++;
+        else if (point == 0 && (val[i] >= 48 && val[i] <= 57)){
+            nb *= 10;
+            nb += (val[i] - 48);
+        }
+        else if (point == 1 && (val[i] >= 48 && val[i] <= 57)){
+            nb += (double)((val[i] - 48) / div);
+            div *= 10;
+        }
+        else 
+            return -1;
+    }
+    return nb;
+}
+
+void    putToList(t_data **beginList, t_data *data){
+    t_data *new = NULL;
+    t_data *temp = NULL;
+
+    temp = *beginList;
+    new = malloc(sizeof(struct s_data));
+    new->val = data->val;
+    new->value = data->value;
+    new->type = data->type;
+    new->side = data->side;
+    new->next = data->next;
+    if (temp == NULL){
+        *beginList = new;
+        return ;
+    }
+    while (temp->next != NULL){
+        temp = temp->next;
+    }
+    temp->next = new;
+}
+
+
+
+
+void    saveData(char *equation, int *len, t_data **beginList, int *side){
+    t_data data;
+
+    data.type = 0;
+    int lenVal = 0;
+    data.value = 0;
+    data.val = NULL;
+    data.next = NULL;
+
+    data.val = insertValueFromEquation(equation);
+    lenVal = strlen(data.val);
+    data.type = findType(data.val, lenVal);
+    if (data.type == EQ)
         *side = RIGHT;
-    printf("side = %d type = %d val = %s\n",*side, type, val);
+    data.side = *side;
+    data.value = (data.type == FACTOR) ? toDouble(data.val) : (data.type == POWER) ? toDouble(data.val + 2) : 0;
+    putToList(beginList, &data);
+    // printf("side = %d type = %d val = %s value = %f\n",data.side, data.type, data.val, data.value);
     *len += lenVal -1;
-    free(val);
 }
 
 int parseData(char *equation, t_data **data){
@@ -113,6 +165,24 @@ int parseData(char *equation, t_data **data){
     return 0;
 }
 
+void displayList(t_data **beginList){
+    t_data *temp = *beginList;
+    while (temp != NULL){
+        printf("side = %d type = %d val = %s value = %f\n", temp->side, temp->type, temp->val, temp->value);
+        temp = temp->next;
+    }
+}
+
+void clearListData(t_data **list){
+    t_data *temp = *list;
+    t_data *temp2 = *list;
+    while (temp != NULL){
+        temp2 = temp;
+        temp = temp->next;
+        free(temp2->val);
+        free(temp2);
+    }
+}
 
 int computorV1(char *equation){
     t_data  *data = NULL;
@@ -126,6 +196,9 @@ int computorV1(char *equation){
     }
     if ((res = parseData(equation, &data)) != 0)
         return (res);
+    reduceEquation(&data);
+    displayList(&data);
+    clearListData(&data);
     return (0);
 }
 

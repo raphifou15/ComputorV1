@@ -24,10 +24,11 @@
 #define RIGHT 1
 
 typedef struct s_data{
-        char *data;
+        char *val;
         double value;
         int type;
         int side;
+        struct s_data *next;
 }       t_data;
 
 
