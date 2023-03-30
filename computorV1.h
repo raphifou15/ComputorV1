@@ -29,6 +29,7 @@ typedef struct s_data{
         int type;
         int side;
         struct s_data *next;
+        struct s_data *prev;
 }       t_data;
 
 

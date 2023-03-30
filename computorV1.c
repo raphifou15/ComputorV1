@@ -14,6 +14,15 @@
 // x1 = ((-b - i racine carre de -delta) / (2a))
 // x2 = ((-b + i racine carre de -delta) / (2a))
 
+
+
+// mettre la facon dont c'est ecrit.
+
+// fason 1 ecriture avec x et puissance;
+// fason 2 ecriture avec x;
+// fason 3 ecriture sans x;
+
+
 #include "computorV1.h"
 
 int ft_strcmp(char *s1, char *s2){
@@ -79,6 +88,7 @@ int findType(char *val, int len){
         else if (val[0] == '/') return DIV;
         else if (val[0] == '*') return MULT;
         else if (val[0] == '=') return EQ;
+        else if (val[0] == 'X') return POWER;
     }
     if (isDouble(val) == 1) return FACTOR;
     if (val[0] == 'X' && val[1] == '^' && isDouble(val + 2) == 1) return POWER;
@@ -112,7 +122,6 @@ double  toDouble(char *val){
 void    putToList(t_data **beginList, t_data *data){
     t_data *new = NULL;
     t_data *temp = NULL;
-
     temp = *beginList;
     new = malloc(sizeof(struct s_data));
     new->val = data->val;
@@ -120,6 +129,7 @@ void    putToList(t_data **beginList, t_data *data){
     new->type = data->type;
     new->side = data->side;
     new->next = data->next;
+    new->prev = data->prev;
     if (temp == NULL){
         *beginList = new;
         return ;
@@ -128,6 +138,7 @@ void    putToList(t_data **beginList, t_data *data){
         temp = temp->next;
     }
     temp->next = new;
+    new->prev = temp;
 }
 
 
@@ -141,6 +152,7 @@ void    saveData(char *equation, int *len, t_data **beginList, int *side){
     data.value = 0;
     data.val = NULL;
     data.next = NULL;
+    data.prev = NULL;
 
     data.val = insertValueFromEquation(equation);
     lenVal = strlen(data.val);
@@ -148,7 +160,7 @@ void    saveData(char *equation, int *len, t_data **beginList, int *side){
     if (data.type == EQ)
         *side = RIGHT;
     data.side = *side;
-    data.value = (data.type == FACTOR) ? toDouble(data.val) : (data.type == POWER) ? toDouble(data.val + 2) : 0;
+    data.value = (data.type == FACTOR) ? toDouble(data.val) : (data.type == POWER && lenVal == 1) ? 1 : (data.type == POWER) ? toDouble(data.val + 2) : 0;
     putToList(beginList, &data);
     // printf("side = %d type = %d val = %s value = %f\n",data.side, data.type, data.val, data.value);
     *len += lenVal -1;
@@ -184,6 +196,34 @@ void clearListData(t_data **list){
     }
 }
 
+// int equationIsReduce(t_data **beginList, int *pos1, int *pos2){
+//     t_data *temp = *beginList;
+//     t_data *temp2 = *beginList;
+//     int p1 = 0;
+//     int p2 = 0;
+
+//     while (temp !== NULL){
+//         while (temp != NULL && temp->type !== POWER)
+//             temp = temp->next;
+//         temp2 = temp->next;
+//         while (temp2 != NULL){
+//             if (temp2->type == POWER && temp2->value == temp->value)
+//                 return 0;
+//             temp2 = temp2->next;
+//         }
+
+//     }
+//     return (1);
+// }
+
+// void    reduceEquation(t_data **beginList){
+//     int pos1 = 0;
+//     int pos2 = 0;
+//     while (equationIsReduce(beginList, &pos1, &pos2) == 0){
+        
+//     }
+// }
+
 int computorV1(char *equation){
     t_data  *data = NULL;
     int     res = 0;
@@ -196,7 +236,7 @@ int computorV1(char *equation){
     }
     if ((res = parseData(equation, &data)) != 0)
         return (res);
-    reduceEquation(&data);
+    // reduceEquation(&data);
     displayList(&data);
     clearListData(&data);
     return (0);
