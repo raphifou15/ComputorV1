@@ -23,6 +23,10 @@
 // fason 3 ecriture sans x;
 
 
+
+// Pour faire une soustraction d'abord chercher
+// lequel des nombres est le plus grand entre les 2 entiers
+
 #include "computorV1.h"
 
 int ft_strlen_float(char *str, int *lenAfter){
@@ -36,6 +40,15 @@ int ft_strlen_float(char *str, int *lenAfter){
         i++;
     }
     *lenAfter = k;
+    return i;
+}
+
+size_t strlenBeforeFloat(char *str){
+    size_t i = 0;
+    for (; str[i] != '\0'; i++){
+        if (str[i] == '.')
+            return i;
+    }
     return i;
 }
 
@@ -76,6 +89,69 @@ char *join(char *res, char c){
     res2[len + 1] = '\0';
     free(res);
     res = NULL;
+    return res2;
+}
+
+char *trimTwoSide(char *res, int supLeft, int supRight){
+    int size = 0;
+    char *res2 = NULL;
+    int j = 0;
+
+    if (res == NULL)
+        return NULL;
+    size = strlen(res);
+    res2 = malloc(sizeof(char) * (size - (supLeft + supRight) + 1));
+    res2[size - (supLeft + supRight)] = '\0';
+    for (int i = supLeft; i < (size - supRight); i++, j++){
+        res2[j] = res[i];
+    }
+    return res2;
+}
+
+char    *purifyingString(char *res){
+    int supRight = 0;
+    int supLeft = 0;
+    int stopCountRight = 0;
+    int stopCountLeft = 0;
+    int isFloat = 0;
+    char *res2 = NULL;
+    
+    for (int i = 0; res[i] != '\0' && i >= 0;){
+        if (stopCountRight == 0 && isFloat == 1){
+            if (res[i] == '.'){
+                stopCountRight = 1;
+                supRight++;
+                i = 0;
+            }
+            else if (res[i] == 48)
+                supRight++;
+            else{
+                stopCountRight = 1;
+                i = 0;
+            }
+        }
+        if (isFloat == 0 && stopCountLeft == 0 && res[i] == 48)
+            supLeft++;
+        else if(isFloat == 0 && res[i] != 48)
+            stopCountLeft = 1;
+        if (isFloat == 0 && res[i] == '.' && isFloat == 0){
+            isFloat = 1;
+            i = strlen(res);
+        }
+        (isFloat == 0) ? i++ : i--;
+    }
+    if ((supRight + supLeft) == (int)strlen(res)){
+        free(res);
+        res = NULL;
+        res2 = (char *)malloc(sizeof(char) * 2);
+        res2[0] = '0'; res2[1] = '\0';
+        return res2;
+    }
+    else {
+        res2 = trimTwoSide(res, supLeft, supRight);
+        free(res);
+        res = NULL;
+    }
     return res2;
 }
 
@@ -122,7 +198,6 @@ char *addString(char *str1, char *str2){
                 if (str2[len2] == '.'){
                     len2--;
                 }
-                    
             }
             if (len1 >= 0 && len2 >= 0)
                 c = c + (str1[len1] - 48) + (str2[len2] - 48);
@@ -135,12 +210,23 @@ char *addString(char *str1, char *str2){
             res = join(res, nval + 48);
         }
     }
+    res = purifyingString(res);
     return res;
+}
+
+
+char    *sousString(char *str1, char *str2){
+    int lenInt1 = strlenBeforeFloat(str1);
+    int lenInt2 = strlenBeforeFloat(str2);
+    printf("lenInt1 = %d\n", lenInt1);
+    printf("lenInt2 = %d\n", lenInt2);
+    return NULL;
 }
 
 int main(int argc, char *argv[]){
     int res = 0;
     char *val = NULL;
+    char *val2 = NULL;
 
     if (argc != 3)
         return 0;
@@ -151,12 +237,17 @@ int main(int argc, char *argv[]){
     // }
 
     val = addString(argv[1], argv[2]);
+    val2 = sousString(argv[1], argv[2]);
     printf("val = %s\n", val);
+    printf("val2 = %s\n", val2);
     if (val != NULL){
         free(val);
         val = NULL;
     }
-    
+    if (val2 != NULL){
+        free(val2);
+        val2 = NULL;
+    }
     // if ((res = computorV1(argv[1])) != 0)
     //     return (ft_error(res));
     return (0);
