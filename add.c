@@ -1,98 +1,5 @@
 #include "math.h"
 
-struct lenPointNumber{
-    long indexBPt;
-    long indexAPt;
-};
-
-static struct lenPointNumber strlenNumberPoint(char *str){
-    struct lenPointNumber lpn;
-    lpn.indexAPt = 0;
-    lpn.indexBPt = 0;
-
-    bool afterPoint = false;  
-    for(long i = 0; str[i] != '\0'; i++){
-        if (str[i] == '.') afterPoint = true;
-        if (afterPoint){
-            lpn.indexAPt++;
-        }else{
-            lpn.indexBPt++;
-        }
-    }
-    return lpn;
-}
-
-static char * supprimZeroBeforeNumber(char *str){
-    if (str == NULL) return NULL;
-    size_t number_zero = 0;
-    while (str[number_zero] != '\0' && str[number_zero] == '0'){
-        number_zero++;
-    }
-    size_t size = strlen(str);
-    size -= number_zero;
-    char *s = (char *)malloc(sizeof(char) * (size + 1));
-    if (s == NULL){
-        free(str);
-        return NULL;
-    }
-    s[size] = '\0';
-    for (int i = 0; i < size; i++){
-        s[i] = str[number_zero];
-        number_zero++;
-    }
-    free(str);
-    return s;
-}
-
-static char * supprimZeroAfterNumber(char *str){
-    if (str == NULL) return NULL;
-    size_t size = 0;
-    while (str[size] != '\0'){
-        size++;
-    }
-    while (size != 0 && str[size - 1] == '0')   size--;
-    if (size != 0 && str[size - 1] == '.')  size--;
-    char *s = (char *)malloc(sizeof(char) * (size + 1));
-    if (s == NULL){
-        free(str);
-        return NULL;
-    }
-    s[size] = '\0';
-    for (int i = 0; i < size; i++){
-        s[i] = str[i];
-    }
-    free(str);
-    return s;
-}
-
-static bool isOnlyNumber(char *s1){
-    if (s1 == NULL) return false;
-    int point = 0;
-    char *s2 = s1;
-    int i = 0;
-    while(*s2 != '\0'){
-        if (i == 0 && *s2 == '.') return false;
-        if (i == 0) i = 1;
-        if (point == 0 && *s2 == '.'){
-            point++;
-        }
-        else if (*s2 < '0' || *s2 > '9') return false;
-        s2++;
-    }
-    s2--;
-    if (*s2 == '.') return false;
-    return true;
-}
-
-static bool isNumberFloat(char *str){
-    char *s = str;
-    while (*s != '\0'){
-        if (*s == '.') return true;
-        s++;
-    }
-    return false;
-}
-
 static char *add_int(char *s1, char *s2, long index1, long index2){
     long sizeMalloc = 0;
     sizeMalloc = (index1 >= index2) ? index1 : index2;
@@ -166,13 +73,9 @@ static char *add_float(char *s1, char *s2, long index1, long index2){
     if (str == NULL) return NULL;
     str[sizeMalloc] = '\0';
 
-    
     int rest = 0;
     bool beforePoint = true;
 
-    // printf("index1AfterPoint = %ld    index2AfterPoint = %ld\n", lpnS1.indexAPt, lpnS2.indexAPt);
-    // printf("index1BeforePoint = %ld    index2BeforePoint = %ld\n", lpnS1.indexBPt, lpnS2.indexBPt);
-    // printf("final size = %ld\n", tmp1 + tmp2);
     for (; sizeMalloc > 0; sizeMalloc--){
         if (beforePoint){
             if (lpnS1.indexAPt == 1 || lpnS2.indexAPt == 1){
@@ -231,8 +134,7 @@ static char *add_float(char *s1, char *s2, long index1, long index2){
                     str[sizeMalloc - 1] = num3 + rest + 48;
                     rest = 0;
                 }
-            }
-            
+            }  
         }
         else{
             if (size1 > 0 && size2 > 0){
@@ -277,12 +179,12 @@ static char *add_float(char *s1, char *s2, long index1, long index2){
     }
     str = supprimZeroBeforeNumber(str);
     str = supprimZeroAfterNumber(str);
-    // faire une fonction qui suprimme les char apres le zero.
     return str;
 }
 
 // continuer a faire la fonction float add.
 char *  add(char *s1, char *s2){
+    bool isneg = false;
     if (s1 == NULL || s2 == NULL) return NULL;
     long index1 = 0;
     long index2 = 0;
@@ -294,11 +196,32 @@ char *  add(char *s1, char *s2){
         if (index2 > LIMIT)
             return NULL;
     }
-    if (isOnlyNumber(s1) == false || isOnlyNumber(s2) == false) return NULL;
+    if (s1[0] == '-' && s2[0] != '-') return sub(s2, s1 + 1);
+    if (s1[0] != '-' && s2[0] == '-') return sub(s1, s2 + 1);
+    if (s1[0] == '-' && s2[0] == '-') isneg = true;
+
+    if (isneg){
+        if (isOnlyNumber(s1 + 1) == false || isOnlyNumber(s2 + 1) == false) return NULL;
+    }
+    else if (isOnlyNumber(s1) == false || isOnlyNumber(s2) == false) return NULL;
     bool isS1Float = isNumberFloat(s1);
     bool isS2Float = isNumberFloat(s2);
 
-    if (!isS1Float && !isS2Float)
+
+    if (!isS1Float && !isS2Float){
+        if (isneg){
+            char *str = add_int(s1 + 1, s2 + 1, --index1, --index2);
+            char *str2 = join("-", str);
+            free(str);
+            return str2;
+        }
         return add_int(s1, s2, index1, index2);
+    }
+    if (isneg){
+            char *str = add_float(s1 + 1, s2 + 1, --index1, --index2);
+            char *str2 = join("-", str);
+            free(str);
+            return str2;
+        }
     return add_float(s1, s2, index1, index2);
 }
