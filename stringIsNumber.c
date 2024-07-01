@@ -27,6 +27,9 @@ char * supprimZeroBeforeNumber(char *str){
     while (str[number_zero] != '\0' && (str[number_zero] == '0')){
         number_zero++;
     }
+    if (str[number_zero] == '.'){
+        number_zero--;
+    }
     size_t size = strlen(str);
     if (isneg)
         size -=  (number_zero - 1);

@@ -26,6 +26,7 @@ char *  join(char *s1, char *s2);
 // renvoie une nouvelle string avec s1 et s2 additionner. si s1 ou s2 a un char qui n'est pas un numero ou si s1 ou s2 est null renvoie null;
 char*   add(char *s1, char *s2);
 char*   sub(char *s1, char *s2);
+char*   mul(char *s1, char *s2);
 
 
 #endif

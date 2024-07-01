@@ -74,10 +74,10 @@ static char *add_float(char *s1, char *s2, long index1, long index2){
     str[sizeMalloc] = '\0';
 
     int rest = 0;
-    bool beforePoint = true;
+    bool afterPoint = true;
 
     for (; sizeMalloc > 0; sizeMalloc--){
-        if (beforePoint){
+        if (afterPoint){
             if (lpnS1.indexAPt == 1 || lpnS2.indexAPt == 1){
                 if (lpnS1.indexAPt == 1 && lpnS2.indexAPt == 1){
                     size1--;
@@ -94,7 +94,7 @@ static char *add_float(char *s1, char *s2, long index1, long index2){
                     lpnS2.indexAPt--;
                 }
                 str[sizeMalloc - 1] = '.';
-                beforePoint = false;
+                afterPoint = false;
             }
             else if (lpnS1.indexAPt > lpnS2.indexAPt){
                 lpnS1.indexAPt--;

@@ -1,8 +1,130 @@
 #include "math.h"
 
-static char *sub_float_next(char *s1, char *s2, struct lenPointNumber *lpns1, struct lenPointNumber *lpns2, bool isneg){
-    // faire le sub des floats et finnir.
-    return NULL;
+static char *sub_float_next(char *s1, char *s2, struct lenPointNumber *lpns1,
+    struct lenPointNumber *lpns2, bool isneg){
+
+    size_t size1 = lpns1->indexAPt + lpns1->indexBPt;
+    size_t size2 = lpns2->indexAPt + lpns2->indexBPt;
+    
+    size_t tmp1 = (lpns1->indexBPt > lpns2->indexBPt) ? lpns1->indexBPt : lpns2->indexBPt;
+    size_t tmp2 = (lpns1->indexAPt > lpns2->indexAPt) ? lpns1->indexAPt : lpns2->indexAPt;
+    size_t sizeMalloc = tmp1 + tmp2;
+
+    if (isneg){
+        sizeMalloc++;
+    }
+    char *str = malloc(sizeof(char) * (sizeMalloc + 1));
+    if (str == NULL) return NULL;
+    str[sizeMalloc] = '\0';
+    int rest = 0;
+    bool afterPoint = true;
+
+    
+    for (;sizeMalloc > 0; sizeMalloc--){
+        if (afterPoint){
+            if (lpns1->indexAPt == 1 || lpns2->indexAPt == 1){
+                if (lpns1->indexAPt == 1 && lpns2->indexAPt){
+                    size1--;
+                    size2--;
+                    lpns1->indexAPt--;
+                    lpns2->indexAPt--;
+                }
+                else if (lpns1->indexAPt == 1){
+                    size1--;
+                    lpns1->indexAPt--;
+                }
+                else{
+                    size2--;
+                    lpns2->indexAPt--;
+                }
+                str[sizeMalloc -1] = '.';
+                afterPoint = false;
+            }
+            else if (lpns1->indexAPt > lpns2->indexAPt){
+                size1--;
+                lpns1->indexAPt--;
+                str[sizeMalloc - 1] = s1[size1];
+            }
+            else if (lpns2->indexAPt > lpns1->indexAPt){
+                size2--;
+                lpns2->indexAPt--;
+                char num1 = 0;
+                char num2 = s2[size2] - 48;
+                char num3 = 0;
+                if (num1 < num2 + rest){
+                    num1 += 10;
+                    num3 = num1 - (num2 + rest);
+                    str[sizeMalloc - 1] = num3 + 48;
+                    rest = 1;
+                }else{
+                    num3 = num1 - (num2 + rest);
+                    str[sizeMalloc - 1] = num3 + 48;
+                    rest = 0;
+                }
+            }else{
+                size1--;
+                size2--;
+                lpns1->indexAPt--;
+                lpns2->indexAPt--;
+                char num1 = s1[size1] - 48;
+                char num2 = s2[size2] - 48;
+                char num3 = 0;
+                if (num1 < num2 + rest){
+                    num1 += 10;
+                    num3 = num1 - (num2 + rest);
+                    str[sizeMalloc -1] = num3 + 48;
+                    rest = 1;
+                }else{
+                    num3 = num1 - (num2 + rest);
+                    str[sizeMalloc -1] = num3 + 48;
+                    rest = 0;
+                }
+            }
+        }else{
+            if (lpns1->indexBPt > 0 && lpns2->indexBPt > 0){
+                size1--;
+                size2--;
+                lpns1->indexBPt--;
+                lpns2->indexBPt--;
+                char num1 = s1[size1] - 48;
+                char num2 = s2[size2] - 48;
+                char num3 = 0;
+                if (num1 < num2 + rest){
+                    num1 += 10;
+                    num3 = num1 - (num2 + rest);
+                    rest = 1;
+                }else{
+                    num3 = num1 - (num2 + rest);
+                    rest = 0;
+                }
+                str[sizeMalloc - 1] = num3 + 48;
+            }
+            else if (lpns1->indexBPt > 0 && lpns2->indexBPt == 0){
+                size1--;
+                lpns1->indexBPt--;
+                char num1 = s1[size1] - 48;
+                char num3 = 0;
+                if (num1 < rest){
+                    num1 += 10;
+                    num3 = num1 - rest;
+                    rest = 1;
+                }else{
+                    num3 = num1 - rest;
+                    rest = 0;
+                }
+                str[sizeMalloc - 1] = num3 + 48;
+            }
+            else if (lpns1->indexBPt == 0 && lpns2->indexBPt == 0){
+                if (isneg){
+                    str[sizeMalloc - 1] = '-';
+                }
+            }
+        }
+    }
+    str =supprimZeroBeforeNumber(str);
+    str = supprimZeroAfterNumber(str);
+   
+    return str;
 }
 
 static char *sub_float(char *s1, char *s2){
