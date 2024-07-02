@@ -126,3 +126,73 @@ char *join (char *s1, char *s2){
     }
     return s;
 }
+
+void decalValueOne(char *s){
+    for (size_t i = 0; s[i] != '\0'; i++){
+        if (s[i] == '.'){
+            char c = s[i];
+            s[i] = s[i + 1];
+            s[i + 1] = c;
+            i++;
+        }
+    }
+    if (s[0] == '0'){
+        for (size_t i = 0; s[i] != '\0'; i++){
+            if (s[i + 1] == '\0'){
+                s[i] = '0';
+            }
+            else{
+                s[i] = s[i + 1];
+            }
+        }
+    }
+}
+
+
+char *decalValue(char *s, struct lenPointNumber lpns1, struct lenPointNumber lpns2){
+    size_t sizeMalloc = lpns1.indexAPt + lpns1.indexBPt + lpns2.indexAPt + lpns2.indexBPt;
+    char *str = malloc(sizeof(char) * (sizeMalloc + 1));
+    if (str == NULL) return NULL;
+    str[sizeMalloc] = '\0';
+    bool isPoint = false;
+    for (size_t i = 0; i < sizeMalloc; i++){
+        if (i < lpns2.indexBPt + lpns2.indexAPt){
+            str[i] = s[i];
+            if (s[i] == '.') isPoint = true;
+        }
+        else{
+            if (isPoint == false){
+                isPoint = true;
+                str[i] = '.';
+            }else
+                str[i] = '0';
+        }
+    }
+    
+    if (lpns1.indexAPt == 0)
+        return str;
+    
+    size_t dec = lpns1.indexAPt - 1;
+    while (dec > 0){
+        for (size_t i = 0; i < sizeMalloc; i++){
+            if (str[i] == '.'){
+                str[i] = str[i - 1];
+                str[i - 1] = '.';
+                break;
+            }
+        }
+        if (str[0] == '.'){
+            for (size_t i = sizeMalloc ; i > 0; i--){
+                if (i == 1){
+                    str[i - 1] = '0';
+                }
+                else{
+                    str[i - 1] = str[i - 2];
+                }
+            }
+        }
+        dec--;
+    }
+    // printf("str2 final = %s\n", str);
+    return str;
+}
