@@ -27,6 +27,13 @@ char * supprimZeroBeforeNumber(char *str){
     while (str[number_zero] != '\0' && (str[number_zero] == '0')){
         number_zero++;
     }
+    if (str[number_zero] == '\0'){
+        free(str);
+        char *s = malloc(sizeof(char) * (1 + 1));
+        s[0] = '0';
+        s[1] = '\0';
+        return s;
+    }
     if (str[number_zero] == '.'){
         number_zero--;
     }
@@ -64,6 +71,13 @@ char * supprimZeroAfterNumber(char *str){
         size++;
     }
     while (size != 0 && str[size - 1] == '0')   size--;
+    if (size == 0){
+        free(str);
+        char *s = malloc(sizeof(char) * (1 + 1));
+        s[0] = '0';
+        s[1] = '\0';
+        return s;
+    }
     if (size != 0 && str[size - 1] == '.')  size--;
     char *s = (char *)malloc(sizeof(char) * (size + 1));
     if (s == NULL){

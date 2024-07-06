@@ -176,7 +176,6 @@ static char *sub_int_next(char *s1, char *s2, struct lenPointNumber *lpns1, stru
                 num3 = num1 - (num2 + rest);
                 rest = 0;
             }
-            printf("%d = num3\n", num3);
             str[sizeMalloc - 1] = num3 + 48;
         }
         else if (lpns1->indexBPt > 0 && lpns2->indexBPt == 0){

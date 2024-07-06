@@ -130,12 +130,23 @@ static char *mul_float(char *s1, char *s2, bool isneg){
     }
     free(tab);
     free(s3);
-     if (isneg){
-        char *str2 = join("-", str);
-        free(str);
+    char *str2 = NULL;
+    if (isneg){
+        if (strlen(str) == 0){
+            str2 = join("0", str);
+            free(str);
+        }else{
+            str2 = join("-", str);
+            free(str);
+        }
         return str2;
     }
-    return str;
+    if (strlen(str) == 0){
+        str2 = join("0", str);
+        free(str);
+        return str2;
+    }else
+        return str;
 }
 
 static char *mul_int(char *s1, char *s2, bool isneg){
