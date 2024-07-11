@@ -54,10 +54,6 @@ static char *add_int(char *s1, char *s2, long index1, long index2){
 
 
 static char *add_float(char *s1, char *s2, long index1, long index2){
-
-    // utiliser la structure se sera plus facile.
-    // il y a la len avant le point et apres le point ce qui peut permettre de savoir la longuer max pour l'addition
-
     struct lenPointNumber lpnS1 = strlenNumberPoint(s1);
     struct lenPointNumber lpnS2 = strlenNumberPoint(s2);
 
@@ -178,11 +174,11 @@ static char *add_float(char *s1, char *s2, long index1, long index2){
         }
     }
     str = supprimZeroBeforeNumber(str);
+    if (str == NULL) return NULL; 
     str = supprimZeroAfterNumber(str);
     return str;
 }
 
-// continuer a faire la fonction float add.
 char *  add(char *s1, char *s2){
     bool isneg = false;
     if (s1 == NULL || s2 == NULL) return NULL;
@@ -211,6 +207,7 @@ char *  add(char *s1, char *s2){
     if (!isS1Float && !isS2Float){
         if (isneg){
             char *str = add_int(s1 + 1, s2 + 1, --index1, --index2);
+            if (str == NULL ) return NULL;
             char *str2 = join("-", str);
             free(str);
             return str2;
@@ -219,6 +216,7 @@ char *  add(char *s1, char *s2){
     }
     if (isneg){
             char *str = add_float(s1 + 1, s2 + 1, --index1, --index2);
+            if (str == NULL) return NULL;
             char *str2 = join("-", str);
             free(str);
             return str2;

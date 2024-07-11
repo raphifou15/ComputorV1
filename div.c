@@ -9,10 +9,8 @@ static int numberBiger(char *s1, char *s2){
     if (s1 == NULL || s2 == NULL) return -1;
     size_t num1 = strlen(s1);
     size_t num2 = strlen(s2);
-    if (num1 > num2)
-        return 1;
-    if (num2 > num1)
-        return -1;
+    if (num1 > num2) return 1;
+    if (num2 > num1) return -1;
     size_t i = 0;
     for (; s1[i] != '\0'; i++){
         if (s1[i] != s2[i])
@@ -26,6 +24,12 @@ static char * makeDivision(struct decalValue *dcv){
     char *subb = strdup(dcv->ns2);
     char *restf = strdup("0");
     char *rest = strdup("1");
+    if (subb == NULL || restf == NULL || rest == NULL){
+        if (subb != NULL) free(subb);
+        if (restf != NULL) free(restf);
+        if (rest != NULL) free(rest);
+        return NULL;
+    }
     bool isFinnish = false;
 
     while (!isFinnish ){

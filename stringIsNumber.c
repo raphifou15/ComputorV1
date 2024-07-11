@@ -210,3 +210,26 @@ char *decalValue(char *s, struct lenPointNumber lpns1, struct lenPointNumber lpn
     // printf("str2 final = %s\n", str);
     return str;
 }
+
+// si le nombre 1 est plus grand renvoie 1;
+// si le mombre 1 est egal renvoie 0;
+// si le nombre 1 est plus petit renvoie -1;
+int numberBigerLowerEqual(char *s1, char *s2){
+    struct lenPointNumber val1 = strlenNumberPoint(s1);
+    struct lenPointNumber val2 = strlenNumberPoint(s2);
+
+    if (s1[0] == '-' && s2[0] != '-') return -1;
+    else if (s1[0] != '-' && s2[0] == '-') return 1;
+    size_t i = 0;
+    if (val1.indexBPt > val2.indexBPt) return 1;
+    else if (val1.indexBPt < val2.indexBPt) return -1;
+    else{
+        for(; s1[i] != '\0' && s2[i] != '\0'; i++){
+            if (s1[i] > s2[i]) return 1;
+            else if (s1[i] < s2[i]) return -1;
+        }
+    }
+    if (s1[i] == s2[i]) return 0;
+    else if(s1[i] > s2[i]) return 1;
+    else return -1;
+}
