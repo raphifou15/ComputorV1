@@ -41,16 +41,32 @@ static char * makeDivision(struct decalValue *dcv){
                 tmp = mul(rest, "2");
             }
             free(rest);
+            if (tmp == NULL){
+                free(subb); free(restf);
+                return NULL;
+            }
             rest = tmp;
             // printf("%s = rest\n", rest);
             char *val = add(rest, restf);
+            if (val == NULL){
+                free(subb); free(rest); free(restf);
+                return NULL;
+            }
             char *tmp2 = mul(dcv->ns2, val);
             free(subb);
             free(val);
+            if (tmp2 == NULL){
+                free(rest); free(restf);
+                return NULL;
+            }
             subb = tmp2;
         }
         tmpval = add(rest, restf);
         free(restf);
+        if (tmpval == NULL){
+            free(rest); free(subb);
+            return NULL;
+        }
         restf = tmpval;
         if (numberBiger(subb, dcv->ns1) == 0){
             isFinnish = true;
@@ -58,6 +74,10 @@ static char * makeDivision(struct decalValue *dcv){
         }
         free(rest);
         rest = strdup("0");
+        if (rest == NULL){
+            free(subb); free(restf);
+            return NULL;
+        }
         while (numberBiger(subb, dcv->ns1) > 0){
             char *tmp = NULL;
             if (strcmp(rest, "0") == 0){
@@ -66,28 +86,52 @@ static char * makeDivision(struct decalValue *dcv){
                 tmp = mul(rest, "2");
             }
             free(rest);
+            if (tmp == NULL){
+                free(subb); free(restf);
+                return NULL;
+            }
             rest = tmp;
             char *val = sub(restf, rest);
+            if (val == NULL){
+                free(subb); free(rest); free(restf);
+                return NULL;
+            }
             char *tmp2 = mul(dcv->ns2, val);
             free(subb);
             free(val);
+            if (tmp2 == NULL){
+                free(rest); free(restf);
+                return NULL;
+            }
             subb = tmp2;
         }
         tmpval = sub(restf, rest);
         free(restf);
+        if (tmpval == NULL){
+            free(subb); free(rest);
+            return NULL;
+        }
         restf = tmpval;
         if (strcmp(rest, "1") == 0){
             isFinnish = true;
         }
         free(rest);
         rest = strdup("0");
+        if (rest == NULL){
+            free(subb); free(restf);
+            return NULL;
+        }
     }
     char *result = sub(dcv->ns1, subb);
+    if (result == NULL){
+        free(subb); free(rest); free(restf);
+        return NULL;
+    }
     free(dcv->ns1);
     dcv->ns1 = result;
     free(subb);
     free(rest);
-    // free(restf);
+
     return restf;
 }
 
@@ -126,14 +170,31 @@ static void decalValueWithMalloc(struct decalValue *dcv, int v){
     }
 }
 
-static void decalValueBegin(char *s1, char *s2, struct decalValue *dcv){
+static bool decalValueBegin(char *s1, char *s2, struct decalValue *dcv){
     struct lenPointNumber lpns1 = strlenNumberPoint(s1);
     struct lenPointNumber lpns2 = strlenNumberPoint(s2);
     size_t sizedec = 0;
     dcv->ns1 = strdup(s1);
+    if (dcv->ns1 == NULL) return false;
     dcv->ns2 = strdup(s2);
-    if (isPoint(dcv->ns1)) dcv->ns1 = supprimZeroAfterNumber(dcv->ns1);
-    if (isPoint(dcv->ns2)) dcv->ns2 = supprimZeroAfterNumber(dcv->ns2);
+    if (dcv->ns2 == NULL){
+        free(dcv->ns1);
+        return false;
+    }
+    if (isPoint(dcv->ns1)){
+        dcv->ns1 = supprimZeroAfterNumber(dcv->ns1);
+        if (dcv->ns1 == NULL){
+            free(dcv->ns2);
+            return false;
+        }
+    }
+    if (isPoint(dcv->ns2)){
+        dcv->ns2 = supprimZeroAfterNumber(dcv->ns2);
+        if (dcv->ns2 == NULL){
+            free(dcv->ns1);
+            return false;
+        }
+    }
     if (lpns1.indexAPt > 0 && lpns2.indexAPt> 0){
         if (lpns1.indexAPt >= lpns2.indexAPt)
             sizedec = lpns1.indexAPt - 1;
@@ -146,35 +207,64 @@ static void decalValueBegin(char *s1, char *s2, struct decalValue *dcv){
         sizedec = lpns2.indexAPt;
     }
     else{
-        return;
+        return true;
     }
     for (size_t i = 0; i < sizedec; i++){
         if (isPoint(dcv->ns1) == true){
             decalWithoutMalloc(dcv->ns1);
-        }else
+        }else{
             decalValueWithMalloc(dcv, 1);
+            if (dcv->ns1 == NULL){
+                free(dcv->ns2);
+                return false;
+            }
+        }
 
         if (isPoint(dcv->ns2) == true){
             decalWithoutMalloc(dcv->ns2);
-        }else
+        }else{
             decalValueWithMalloc(dcv, 2);
+            if (dcv->ns2 == NULL){
+                free(dcv->ns1);
+                return false;
+            }
+        }
     }
     dcv->ns1 = supprimZeroBeforeNumber(dcv->ns1);
+    if (dcv->ns1 == NULL){
+        free(dcv->ns2);
+        return false;
+    }
     dcv->ns2 = supprimZeroBeforeNumber(dcv->ns2);
-    if (isNumberFloat(dcv->ns1)) dcv->ns1 = supprimZeroAfterNumber(dcv->ns1);
-    if (isNumberFloat(dcv->ns2)) dcv->ns2 = supprimZeroAfterNumber(dcv->ns2);
+    if (dcv->ns2 == NULL){
+        free(dcv->ns1);
+        return false;
+    }
+    if (isNumberFloat(dcv->ns1)){
+        dcv->ns1 = supprimZeroAfterNumber(dcv->ns1);
+        if (dcv->ns1 == NULL){
+            free(dcv->ns2);
+            return false;
+        }
+    }
+    if (isNumberFloat(dcv->ns2)){
+        dcv->ns2 = supprimZeroAfterNumber(dcv->ns2);
+        if (dcv->ns2 == NULL){
+            free(dcv->ns1);
+            return false;
+        }
+    }
+    return true;
 }
 
 static char *div_number(char *s1, char *s2, bool isneg){
-    // printf("s1 = %s\n", s1);
-    // printf("s2 = %s\n", s2);
     struct decalValue dcv;
     dcv.ns1 = NULL;
     dcv.ns2 = NULL;
-    decalValueBegin(s1, s2, &dcv);
-    // printf("dcv.ns1 = %s\n", dcv.ns1);
-    // printf("dcv.ns2 = %s\n", dcv.ns2);
-
+    if (decalValueBegin(s1, s2, &dcv) == false){
+        return NULL;
+    }
+    
     if (strcmp(dcv.ns1, "0") == 0){
         free(dcv.ns2);
         return dcv.ns1;
@@ -196,6 +286,10 @@ static char *div_number(char *s1, char *s2, bool isneg){
     char *dividende = NULL;
     if (diff >= 0){
         dividende = makeDivision(&dcv);
+        if (dividende == NULL){
+            free(dcv.ns1); free(dcv.ns2);
+            return NULL;
+        }
         if (strcmp(dcv.ns1, "0") == 0){
             free(dcv.ns1);
             free(dcv.ns2);
@@ -209,27 +303,51 @@ static char *div_number(char *s1, char *s2, bool isneg){
         else{
             char *tmp = join(dividende, ".");
             free(dividende);
+            if (tmp == NULL){
+                free(dcv.ns1); free(dcv.ns2);
+                return NULL;
+            }
             dividende = tmp;
         }
     }
     else{
         dividende = strdup("0.");
+        if (dividende == NULL){
+            free(dcv.ns1); free(dcv.ns2);
+            return NULL;
+        }
     }
     int k = 0;
     while (strcmp(dcv.ns1, "0") != 0 && k < 100){
         char *tmp = join(dcv.ns1, "0");
         free(dcv.ns1);
+        if (tmp == NULL){
+            free(dcv.ns2); free(dividende);
+            return NULL;
+        }
         dcv.ns1 = tmp;
         diff = numberBiger(dcv.ns1, dcv.ns2);
         if (diff < 0){
             char *tmp2 = join(dividende, "0");
             free(dividende);
+            if (tmp2 == NULL){
+                free(dcv.ns1); free(dcv.ns2);
+                return NULL;
+            }
             dividende = tmp2;
         }else{
             char *dividende2 = makeDivision(&dcv);
+            if (dividende2 == NULL){
+                free(dividende); free(dcv.ns1); free(dcv.ns2);
+                return NULL;
+            }
             char *tmp2 = join(dividende, dividende2);
             free(dividende);
             free(dividende2);
+            if (tmp2 == NULL){
+                free(dcv.ns1); free(dcv.ns2);
+                return NULL;
+            }
             dividende = tmp2;
         }
         k++;
@@ -239,6 +357,10 @@ static char *div_number(char *s1, char *s2, bool isneg){
     if (isneg){
         char *tmp = join("-", dividende);
         free(dividende);
+        if (tmp == NULL){
+            free(dcv.ns1); free(dcv.ns2);
+            return NULL;
+        }
         dividende = tmp;
     }
 
@@ -253,11 +375,11 @@ char *divi(char *s1, char *s2){
     long index2 = 0;
     bool isneg = false;
     for(; s1[index1] != '\0'; index1++) {
-        if (index1 > LIMIT)
+        if ((unsigned long)index1 > LIMIT)
             return NULL;
     }
     for(; s2[index2] != '\0'; index2++){
-        if (index2 > LIMIT)
+        if ((unsigned long)index2 > LIMIT)
             return NULL;
     }
     if (s1[0] == '-' && s2[0] == '-'){
@@ -275,5 +397,5 @@ char *divi(char *s1, char *s2){
         isneg = true;
         if (isOnlyNumber(s1) == false || isOnlyNumber(s2) == false) return NULL;      
     }
-    div_number(s1, s2, isneg);
+    return div_number(s1, s2, isneg);
 }

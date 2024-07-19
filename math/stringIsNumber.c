@@ -30,6 +30,7 @@ char * supprimZeroBeforeNumber(char *str){
     if (str[number_zero] == '\0'){
         free(str);
         char *s = malloc(sizeof(char) * (1 + 1));
+        if (s == NULL) return NULL;
         s[0] = '0';
         s[1] = '\0';
         return s;
@@ -39,7 +40,7 @@ char * supprimZeroBeforeNumber(char *str){
     }
     size_t size = strlen(str);
     if (isneg)
-        size -=  (number_zero - 1);
+        size -= (number_zero - 1);
     else 
         size -= number_zero;
     char *s = (char *)malloc(sizeof(char) * (size + 1));
@@ -48,7 +49,7 @@ char * supprimZeroBeforeNumber(char *str){
         return NULL;
     }
     s[size] = '\0';
-    for (int i = 0; i < size; i++){
+    for (size_t i = 0; i < size; i++){
         if (isneg){
             if (i == 0)
                 s[i] = '-';
@@ -74,6 +75,7 @@ char * supprimZeroAfterNumber(char *str){
     if (size == 0){
         free(str);
         char *s = malloc(sizeof(char) * (1 + 1));
+        if (s == NULL) return NULL;
         s[0] = '0';
         s[1] = '\0';
         return s;
@@ -85,7 +87,7 @@ char * supprimZeroAfterNumber(char *str){
         return NULL;
     }
     s[size] = '\0';
-    for (int i = 0; i < size; i++){
+    for (size_t i = 0; i < size; i++){
         s[i] = str[i];
     }
     free(str);
@@ -170,7 +172,7 @@ char *decalValue(char *s, struct lenPointNumber lpns1, struct lenPointNumber lpn
     str[sizeMalloc] = '\0';
     bool isPoint = false;
     for (size_t i = 0; i < sizeMalloc; i++){
-        if (i < lpns2.indexBPt + lpns2.indexAPt){
+        if ((long)i < lpns2.indexBPt + lpns2.indexAPt){
             str[i] = s[i];
             if (s[i] == '.') isPoint = true;
         }

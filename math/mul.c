@@ -13,10 +13,7 @@ static char *mul_float(char *s1, char *s2, bool isneg){
         if (str == NULL) return NULL;
         if (isneg){
             char *str2 = join("-", str);
-            if (str2 == NULL){
-                free(str);
-                return NULL;
-            }
+            free(str);
             return str2;
         }
         return str;
@@ -25,10 +22,7 @@ static char *mul_float(char *s1, char *s2, bool isneg){
         if (str == NULL) return NULL;
         if (isneg){
             char *str2 = join("-", str);
-            if (str2 == NULL){
-                free(str);
-                return NULL;
-            }
+            free(str);
             return str2;
         }
         return str;
@@ -42,7 +36,7 @@ static char *mul_float(char *s1, char *s2, bool isneg){
     struct lenPointNumber lpns1 = strlenNumberPoint(s1);
     struct lenPointNumber lpns2 = strlenNumberPoint(s2);
 
-    char *s3 = decalValue(s2, lpns1, lpns2);
+    char *s3 = decalValue(s2, lpns1, lpns2); // s3 malloc
     
     if (s3 == NULL) return NULL;
     // printf("s3 = %s\n", s3);
@@ -52,7 +46,7 @@ static char *mul_float(char *s1, char *s2, bool isneg){
         free(s3);
         return NULL;
     };
-    size_t rest = 0;
+    // size_t rest = 0;
     size_t j = size1;
     for (size_t i = 0; i < sizeTab; i++){
         size_t sizeMalloc = size1 + size2 + 1;
@@ -95,15 +89,13 @@ static char *mul_float(char *s1, char *s2, bool isneg){
             }else{
                 tab[i][sizeMalloc - 1] = '0';
             }
-            // ici faire le calcul de chaque ligne.
         }
         j--;
         decalValueOne(s3);
-        // printf("tab[i] = %s\n", tab[i]);
 
         if (i == 0){
             str = strdup(tab[i]);
-            if (tab[i] == NULL){
+            if (str == NULL){
                 free(tab);
                 free(s3);
                 return NULL;
@@ -162,10 +154,7 @@ static char *mul_int(char *s1, char *s2, bool isneg){
         if (str == NULL) return NULL;
         if (isneg){
             char *str2 = join("-", str);
-            if (str2 == NULL){
-                free(str);
-                return NULL;
-            }
+            free(str);
             return str2;
         }
         return str;
@@ -174,10 +163,7 @@ static char *mul_int(char *s1, char *s2, bool isneg){
         if (str == NULL) return NULL;
         if (isneg){
             char *str2 = join("-", str);
-            if (str2 == NULL){
-                free(str);
-                return NULL;
-            }
+            free(str);
             return str2;
         }
         return str;
@@ -265,11 +251,11 @@ char *mul(char *s1, char *s2){
     long index2 = 0;
     bool isneg = false;
     for(; s1[index1] != '\0'; index1++) {
-        if (index1 > LIMIT)
+        if ((unsigned long)index1 > LIMIT)
             return NULL;
     }
     for(; s2[index2] != '\0'; index2++){
-        if (index2 > LIMIT)
+        if ((unsigned long)index2 > LIMIT)
             return NULL;
     }
     if (s1[0] == '-' && s2[0] == '-'){

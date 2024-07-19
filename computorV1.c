@@ -1,10 +1,11 @@
-#include "math.h"
+#include "computorV1.h"
 
 struct values{
     int             side; //0 left, 1 right, 2 middle;
     int             sign; // 0: pas de sign, 1:+, 2:-, 3:*, 4:/     
     int             degree;
     char            *val;
+    char            *display;
     struct values   *next;
     struct values   *prev;
 };
@@ -107,6 +108,7 @@ struct values * parseData(char *s){
         if (s[i] == 32){continue;}
         else if(s[i] == '/' || s[i] == '*' || s[i] == '+' || s[i] == '-'){
             struct values *tmp = malloc(sizeof(struct values));
+            tmp->display = NULL;
             tmp->side = side;
             if (s[i] == '+'){
                    tmp->sign = 1;
@@ -140,6 +142,7 @@ struct values * parseData(char *s){
             }
         } else if (s[i] <= '9' && s[i] >= '0'){
             struct values *tmp = malloc(sizeof(struct values));
+            tmp->display = NULL;
             tmp->side = side;
             tmp->sign = 0;
             size_t sizeNumber = sizeNumberFloat(s + i);
@@ -175,6 +178,7 @@ struct values * parseData(char *s){
             }
         } else if (s[i] == '='){
             struct values *tmp = malloc(sizeof(struct values));
+            tmp->display = NULL;
             tmp->side = 2;
             side++;
             tmp->sign = 0;
@@ -298,7 +302,7 @@ struct values *multiplicationAndDivisionData(struct values *data){
 
 struct values * additionAndSubtractionData(struct values *data){
     struct values *tmp = data;
-    struct values *tmpStrut;
+    // struct values *tmpStrut;
     size_t i = 0;
     while (tmp != NULL){
         if (tmp->val[0] >= '0' && tmp->val[0] <= '9'){
@@ -747,6 +751,9 @@ void equation(char *s){
         fprintf(stderr, "syntax error\n");
         return;
     }
+    #ifdef BONUS
+
+    #endif
     struct values *data = parseData(s);
     // creer une fonction qui fait les multiplications de chaque coter.
     data = multiplicationAndDivisionData(data);
@@ -816,3 +823,6 @@ int main(int argc, char **av){
     equation(av[1]);
     return 0;
 }
+
+    // #ifdef BONUS
+    // #endif

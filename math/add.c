@@ -53,7 +53,7 @@ static char *add_int(char *s1, char *s2, long index1, long index2){
 }
 
 
-static char *add_float(char *s1, char *s2, long index1, long index2){
+static char *add_float(char *s1, char *s2){
     struct lenPointNumber lpnS1 = strlenNumberPoint(s1);
     struct lenPointNumber lpnS2 = strlenNumberPoint(s2);
 
@@ -185,11 +185,11 @@ char *  add(char *s1, char *s2){
     long index1 = 0;
     long index2 = 0;
     for(; s1[index1] != '\0'; index1++) {
-        if (index1 > LIMIT)
+        if ((unsigned long)(index1) > LIMIT)
             return NULL;
     }
     for(; s2[index2] != '\0'; index2++){
-        if (index2 > LIMIT)
+        if ((unsigned long)(index2) > LIMIT)
             return NULL;
     }
     if (s1[0] == '-' && s2[0] != '-') return sub(s2, s1 + 1);
@@ -215,11 +215,11 @@ char *  add(char *s1, char *s2){
         return add_int(s1, s2, index1, index2);
     }
     if (isneg){
-            char *str = add_float(s1 + 1, s2 + 1, --index1, --index2);
+            char *str = add_float(s1 + 1, s2 + 1);
             if (str == NULL) return NULL;
             char *str2 = join("-", str);
             free(str);
             return str2;
         }
-    return add_float(s1, s2, index1, index2);
+    return add_float(s1, s2);
 }

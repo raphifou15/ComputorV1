@@ -19,7 +19,6 @@ static char *sub_float_next(char *s1, char *s2, struct lenPointNumber *lpns1,
     int rest = 0;
     bool afterPoint = true;
 
-    
     for (;sizeMalloc > 0; sizeMalloc--){
         if (afterPoint){
             if (lpns1->indexAPt == 1 || lpns2->indexAPt == 1){
@@ -122,8 +121,8 @@ static char *sub_float_next(char *s1, char *s2, struct lenPointNumber *lpns1,
         }
     }
     str =supprimZeroBeforeNumber(str);
+    if (str == NULL) return NULL;
     str = supprimZeroAfterNumber(str);
-   
     return str;
 }
 
@@ -150,7 +149,6 @@ static char *sub_float(char *s1, char *s2){
     str[0] = '0';
     str[1] = '\0';
     return str;
-    return NULL;
 }
 
 static char *sub_int_next(char *s1, char *s2, struct lenPointNumber *lpns1, struct lenPointNumber *lpns2, bool isneg){
@@ -228,11 +226,11 @@ char    *sub(char *s1, char *s2){
     long index1 = 0;
     long index2 = 0;
     for(; s1[index1] != '\0'; index1++) {
-        if (index1 > LIMIT)
+        if ((unsigned long)index1 > LIMIT)
             return NULL;
     }
     for(; s2[index2] != '\0'; index2++){
-        if (index2 > LIMIT)
+        if ((unsigned long)index2 > LIMIT)
             return NULL;
     }
     if (s1[0] == '-' && s2[0] != '-'){
