@@ -1,15 +1,5 @@
 #include "computorV1.h"
 
-struct values{
-    int             side; //0 left, 1 right, 2 middle;
-    int             sign; // 0: pas de sign, 1:+, 2:-, 3:*, 4:/     
-    int             degree;
-    char            *val;
-    char            *display;
-    struct values   *next;
-    struct values   *prev;
-};
-
 static size_t sizeNumberFloat(char *s){
     size_t i = 0;
     while (s[i] != '\0' && s[i] != 32){
@@ -52,6 +42,7 @@ bool isSyntaxError(char *s){
     bool haveSpace = false;
     bool equal = false;
     bool sign = true;
+    bool afterEqual = false;
     for (size_t i = 0; s[i] != '\0'; i++){
         if (s[i] != 32 && haveSpace) return false;
         if (s[i] == 32){
@@ -76,6 +67,7 @@ bool isSyntaxError(char *s){
             i += y - 1;
             haveSpace = true;
             sign = false;
+            if (equal == true) afterEqual = true;
         }
         else if ((i == 0) && s[i] == '-'){
             sign = true;
@@ -98,6 +90,8 @@ bool isSyntaxError(char *s){
         }
     }
     if (equal == false) return false;
+    if (sign == true ) return false;
+    if (afterEqual == false) return false;
     return true;
 }
 
@@ -747,14 +741,27 @@ char *solutionNegatifSecondDegree(struct values *data, char *delta, int l){
 }
 
 void equation(char *s){
+    struct values *data = NULL;
+    #ifndef BONUS
     if (isSyntaxError(s) == false){
         fprintf(stderr, "syntax error\n");
         return;
     }
-    #ifdef BONUS
-
+    data = parseData(s);
     #endif
-    struct values *data = parseData(s);
+    #ifdef BONUS
+        if (isSyntaxErrorBonus(s) == false){
+            return;
+        }
+        data = parseDataBonus(s);
+        // while (data != NULL){
+        //     printf("%s ",data->val);
+        //     data = data->next; 
+        // }
+        // printf("\n");
+        // return ;
+    #endif
+    
     // creer une fonction qui fait les multiplications de chaque coter.
     data = multiplicationAndDivisionData(data);
     // creer une fonction qui fait les additions et soustraction de chaque coter.
