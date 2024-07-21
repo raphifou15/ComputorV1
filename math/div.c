@@ -257,7 +257,7 @@ static bool decalValueBegin(char *s1, char *s2, struct decalValue *dcv){
     return true;
 }
 
-static char *div_number(char *s1, char *s2, bool isneg){
+static char *div_number(char *s1, char *s2, bool isneg, bool fraction){
     struct decalValue dcv;
     dcv.ns1 = NULL;
     dcv.ns2 = NULL;
@@ -282,12 +282,20 @@ static char *div_number(char *s1, char *s2, bool isneg){
         return ns1;
     }
 
+    // printf("dcv.ns1 = %s  dcv.ns2 = %s\n", dcv.ns1, dcv.ns2);
+    
+    char *save = NULL;
+    if (fraction == true){
+        save = strdup(dcv.ns1);
+    }
+    
+    
     int diff = numberBiger(dcv.ns1, dcv.ns2);
     char *dividende = NULL;
     if (diff >= 0){
         dividende = makeDivision(&dcv);
         if (dividende == NULL){
-            free(dcv.ns1); free(dcv.ns2);
+            free(dcv.ns1); free(dcv.ns2); if(fraction == true){free(save);}
             return NULL;
         }
         if (strcmp(dcv.ns1, "0") == 0){
@@ -298,19 +306,36 @@ static char *div_number(char *s1, char *s2, bool isneg){
                 free(dividende);
                 dividende = tmp;
             }
+            if(fraction == true){free(save);}
+            if (fraction == true){
+                char *res = join(dividende, " / 1");
+                free(dividende);
+                return res;
+            }
             return dividende;
         }
         else{
             char *tmp = join(dividende, ".");
             free(dividende);
             if (tmp == NULL){
-                free(dcv.ns1); free(dcv.ns2);
+                free(dcv.ns1); free(dcv.ns2); if(fraction == true){free(save);}
                 return NULL;
             }
             dividende = tmp;
         }
     }
     else{
+        if (fraction == true){
+            char *a = join(dcv.ns1, " / ");
+            char *res = join(a, dcv.ns2);
+            free(dcv.ns1); free(dcv.ns2); free(a); free(save);
+            if (isneg == true){
+                char *resn = join("-", res);
+                free(res);
+                return resn;
+            }
+            return res;
+        }
         dividende = strdup("0.");
         if (dividende == NULL){
             free(dcv.ns1); free(dcv.ns2);
@@ -318,6 +343,31 @@ static char *div_number(char *s1, char *s2, bool isneg){
         }
     }
     int k = 0;
+    if (fraction == true){
+        if (strcmp(dcv.ns1, "0") == 0){
+            free(save);
+            free(dcv.ns1);
+            char *a = join(dividende, " / ");
+            char *res = join(a, dcv.ns2);
+            free(a); free(dcv.ns2); free(dividende);
+            if (isneg == true){
+                char *resn = join("-", res);
+                free(res);
+                return resn;
+            }
+            return res;
+        }else{
+            char *a = join(save, " / ");
+            char *res = join(a, dcv.ns2);
+            free(a); free(dividende); free(dcv.ns1); free(dcv.ns2); free(save);
+            if (isneg == true){
+                char *resn = join("-", res);
+                free(res);
+                return resn;
+            }
+            return res;
+        }
+    }
     while (strcmp(dcv.ns1, "0") != 0 && k < 100){
         char *tmp = join(dcv.ns1, "0");
         free(dcv.ns1);
@@ -369,7 +419,7 @@ static char *div_number(char *s1, char *s2, bool isneg){
     return dividende;
 }
 
-char *divi(char *s1, char *s2){
+char *divi(char *s1, char *s2, bool fraction){
     if (s1 == NULL || s2 == NULL) return NULL;
     long index1 = 0;
     long index2 = 0;
@@ -397,5 +447,5 @@ char *divi(char *s1, char *s2){
         isneg = true;
         if (isOnlyNumber(s1) == false || isOnlyNumber(s2) == false) return NULL;      
     }
-    return div_number(s1, s2, isneg);
+    return div_number(s1, s2, isneg, fraction);
 }

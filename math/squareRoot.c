@@ -19,13 +19,13 @@ static char *methodeHeron(char *val, char *s){
         free(val2); free(power); free(power2);
         return NULL;
     }
-    char *xn = divi(val3, "2");
+    char *xn = divi(val3, "2", false);
     free(val2); free(power); free(power2); free(val3);
     if (xn == NULL) return NULL;
     size_t i = 0;
     while(i < 5){
         // number diviser par xn
-        char *nbdivixn = divi(s, xn);
+        char *nbdivixn = divi(s, xn, false);
         if (nbdivixn == NULL){
             free(xn);
             return NULL;

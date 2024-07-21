@@ -17,6 +17,8 @@ struct values{
 void   bonusActivate(void);
 bool   isSyntaxErrorBonus(char *s);
 struct values * parseDataBonus(char *s);
+void  displayDataBonus(struct values *data, bool reduce);
+void displayCalcul(char *val1, char *val2, int degree, char sign);
 #endif
 
 #endif

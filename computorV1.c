@@ -1,5 +1,10 @@
 #include "computorV1.h"
 
+struct solucediv{
+    char *fraction;
+    char *soluce;
+};
+
 static size_t sizeNumberFloat(char *s){
     size_t i = 0;
     while (s[i] != '\0' && s[i] != 32){
@@ -36,6 +41,34 @@ static size_t checkNumber(char *s){
         }
     }
     return i;
+}
+
+static void  displayData(struct values *data){
+    struct values *tmp = data;
+    struct values *tmp2 = NULL;
+    size_t i = 0;
+    printf("Reduced form: ");
+    while (tmp != NULL){
+        tmp2 = tmp;
+        if (i == 0 && tmp->val[0] == '='){
+            printf("0 %s ", tmp->val);
+        }
+        else if(tmp->val[0] == '='){
+            printf("%s ", tmp->val);
+        }
+        else if(tmp->val[0] >= '0' && tmp->val[0] <= '9'){
+            printf ("%s * X^%d ", tmp->val, tmp->degree);
+        }
+        else{
+            printf("%s ", tmp->val);
+        }
+        tmp = tmp->next;
+        i++;
+    }
+    if (tmp2->val[0] == '='){
+        printf("0 ");
+    }
+    printf("\n");
 }
 
 bool isSyntaxError(char *s){
@@ -202,6 +235,9 @@ struct values *multiplicationAndDivisionData(struct values *data){
     size_t i = 0;
     while (tmp != NULL){
         if (tmp->val[0] == '*'){
+            #ifdef BONUS
+                displayCalcul(tmp->prev->val, tmp->next->val, tmp->prev->degree, '*');
+            #endif
             char *val = mul(tmp->prev->val, tmp->next->val);
             int degree = tmp->prev->degree + tmp->next->degree;
             struct values *new = malloc(sizeof(struct values));
@@ -240,12 +276,15 @@ struct values *multiplicationAndDivisionData(struct values *data){
                 free(tmp2->val);
                 free(tmp2);
                 new->next = tmp;
-                tmp->prev = new;
+                if (tmp != NULL) tmp->prev = new;
                 i = 0;
                 tmp = data;
             }
         }else if (tmp->val[0] == '/'){
-            char *val = divi(tmp->prev->val, tmp->next->val);
+            #ifdef BONUS
+                displayCalcul(tmp->prev->val, tmp->next->val, tmp->prev->degree, '/');
+            #endif
+            char *val = divi(tmp->prev->val, tmp->next->val, false);
             int degree = tmp->prev->degree - tmp->next->degree;
             struct values *new = malloc(sizeof(struct values));
             new->side = tmp->side;
@@ -283,13 +322,13 @@ struct values *multiplicationAndDivisionData(struct values *data){
                 free(tmp2->val);
                 free(tmp2);
                 new->next = tmp;
-                tmp->prev = new;
+                if(tmp != NULL) tmp->prev = new;
                 i = 0;
                 tmp = data;
             }
         }
         tmp = tmp->next;
-        i++; 
+        i++;
     }
     return data;
 }
@@ -315,14 +354,26 @@ struct values * additionAndSubtractionData(struct values *data){
                     char *val = NULL;
                     if (tmp2->prev->val[0] == '-'){
                         if (tmp2->side == tmp->side){
+                            #ifdef BONUS
+                                displayCalcul(valtmp, tmp2->val, tmp2->degree, '-');
+                            #endif
                             val = sub(valtmp, tmp2->val);
                         }else{
+                            #ifdef BONUS
+                                displayCalcul(valtmp, tmp2->val, tmp2->degree, '+');
+                            #endif
                             val = add(valtmp, tmp2->val);
                         }
                     }else{
                         if (tmp2->side == tmp->side){
+                            #ifdef BONUS
+                                displayCalcul(valtmp, tmp2->val, tmp2->degree, '+');
+                            #endif
                             val = add(valtmp, tmp2->val);
                         }else{
+                            #ifdef BONUS
+                                displayCalcul(valtmp, tmp2->val, tmp2->degree, '-');
+                            #endif
                             val = sub(valtmp, tmp2->val);
                         }
                     }
@@ -380,7 +431,9 @@ struct values * additionAndSubtractionData(struct values *data){
                         free(tmp2);
                         tmp2 = tmp3;
                     }
-                    
+                    #ifdef BONUS
+                        displayDataBonus(data, false);
+                    #endif
                 }
                 tmp2 = tmp2->next;
             }
@@ -503,33 +556,7 @@ struct values * putDataOnLeftSide(struct values *data){
     return data;
 }
 
-void displayData(struct values *data){
-    struct values *tmp = data;
-    struct values *tmp2 = NULL;
-    size_t i = 0;
-    printf("Reduced form: ");
-    while (tmp != NULL){
-        tmp2 = tmp;
-        if (i == 0 && tmp->val[0] == '='){
-            printf("0 %s ", tmp->val);
-        }
-        else if(tmp->val[0] == '='){
-            printf("%s ", tmp->val);
-        }
-        else if(tmp->val[0] >= '0' && tmp->val[0] <= '9'){
-            printf ("%s * X^%d ", tmp->val, tmp->degree);
-        }
-        else{
-            printf("%s ", tmp->val);
-        }
-        tmp = tmp->next;
-        i++;
-    }
-    if (tmp2->val[0] == '='){
-        printf("0 ");
-    }
-    printf("\n");
-}
+
 
 int degreeEquation(struct values *data){
     struct values *tmp = data;
@@ -570,8 +597,15 @@ void solutionOneDegreeEquation(struct values *data){
         }
         tmp = tmp->next;
     }
-    char *res = divi(num, div);
+    // printf("num = %s  div = %s\n", num, div);
+    char *res = divi(num, div, false);
     printf("%s\n", res);
+    #ifdef BONUS
+        char *res2 = divi(num, div, true);
+        printf("res fraction: %s\n", res2);
+        free(res2);
+    #endif
+
     free(res);
 }
 
@@ -621,7 +655,7 @@ char *calculDelta(struct values *data){
     return delta;
 }
 
-char *solutionPositifSecondDegree(struct values *data, char *delta, int l){
+struct solucediv *solutionPositifSecondDegree(struct values *data, char *delta, int l){
     char *soluce = NULL;
     char *vala = NULL;
     char *valb = NULL;
@@ -651,9 +685,13 @@ char *solutionPositifSecondDegree(struct values *data, char *delta, int l){
     char *tmp2 = NULL;
     if (l == 1) tmp2 = sub(valb, rdelta);
     else tmp2 = add(valb, rdelta);
-    soluce = divi(tmp2, doublea);
+    soluce = divi(tmp2, doublea, false);
+    char *fraction = divi(tmp2, doublea, true);
     free(doublea); free(rdelta); free(tmp2);free(vala); free(valb);
-    return soluce;
+    struct solucediv *s = malloc(sizeof(struct solucediv));
+    s->soluce = soluce;
+    s->fraction = fraction;
+    return s;
 }
 
 char *solutionEqualZeroSecondDegree(struct values *data){
@@ -681,7 +719,7 @@ char *solutionEqualZeroSecondDegree(struct values *data){
         tmp = tmp->next;
     }
     char *doublea = mul("2", vala);
-    soluce = divi(valb, doublea);
+    soluce = divi(valb, doublea, false);
     free(vala); free(valb); free(doublea);
     return soluce;
 }
@@ -697,8 +735,9 @@ bool checkIfEquationPossible(struct values *data){
     return true; 
 }
 
-char *solutionNegatifSecondDegree(struct values *data, char *delta, int l){
+struct solucediv *solutionNegatifSecondDegree(struct values *data, char *delta, int l){
     char *soluce = NULL;
+    char *fraction = NULL;
     char *vala = NULL;
     char *valb = NULL;
     struct values *tmp = data;
@@ -723,21 +762,33 @@ char *solutionNegatifSecondDegree(struct values *data, char *delta, int l){
     }
     char *doublea = mul("2", vala);
     char *rdelta = squareRoot(delta);
-    char *div1 = divi(valb, doublea);
-    char *div2 = divi(rdelta, doublea);
+    char *div1 = divi(valb, doublea, false);
+    char *div2 = divi(rdelta, doublea, false);
+
+    char *div1B = divi(valb, doublea, true);
+    char *div2B = divi(rdelta, doublea, true);
+    
     if (l == 1){
         char *reu1 = join(div1, " - i * ");
         soluce = join(reu1, div2);
         free(reu1);
-
+        char *reu1B = join(div1B, " - i * ");
+        fraction = join(reu1B, div2B);
+        free(reu1B);
+        
     } else if (l != 1){
         char *reu1 = join(div1, " + i * ");
         soluce = join(reu1, div2);
         free(reu1);
+        char *reu1B = join(div1B, " + i * ");
+        fraction = join(reu1B, div2B);
+        free(reu1B);
     }
-    free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2) ;
-    return soluce;
-
+    free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B); free(div2B);
+    struct solucediv *s = malloc(sizeof(struct solucediv));
+    s->fraction = fraction;
+    s->soluce = soluce; 
+    return s;
 }
 
 void equation(char *s){
@@ -764,13 +815,21 @@ void equation(char *s){
     
     // creer une fonction qui fait les multiplications de chaque coter.
     data = multiplicationAndDivisionData(data);
+    // displayData(data);
+    // return;
     // creer une fonction qui fait les additions et soustraction de chaque coter.
     data = additionAndSubtractionData(data);
     // creer une fonction qui met tous les nombres du coter gauche.
     data = putDataOnLeftSide(data);
     // creer une fonction qui affiche la version reduite de l'equation
-    displayData(data);
-    data = supprimZeroOfData(data);
+    #ifdef BONUS
+        data = supprimZeroOfData(data);
+        displayDataBonus(data, true);
+    #endif
+    #ifndef BONUS
+        displayData(data);
+        data = supprimZeroOfData(data);
+    #endif
     // creer une fonction qui deduit le degrees de l'equation.
     int degree = degreeEquation(data);
     printf("Polynomial degree: %d\n", degree);
@@ -791,13 +850,16 @@ void equation(char *s){
         printf("delta = %s\n", delta);
         int nbSolution = numberBigerLowerEqual(delta, "0");
         if (nbSolution == 1){
-            printf("Discriminant is strictly positive, the two solutions are:\n");
-            char *firstSolution = solutionPositifSecondDegree(data, delta, 1);
-            printf("%s\n", firstSolution);
-            char *secondSolution = solutionPositifSecondDegree(data, delta, 2);
-            printf("%s\n", secondSolution);
-            free(firstSolution);
-            free(secondSolution);
+            printf("Discriminant is strictly positive\nThe two solutions are:\n");
+            struct solucediv *firstSolution = solutionPositifSecondDegree(data, delta, 1);
+            struct solucediv *secondSolution = solutionPositifSecondDegree(data, delta, 2);
+            printf("%s\n%s\n", firstSolution->soluce, secondSolution->soluce);
+            #ifdef BONUS
+                printf("The two solutions fractions are:\n");
+                printf("%s\n%s\n", firstSolution->fraction, secondSolution->fraction);
+            #endif
+            free(firstSolution->fraction); free(firstSolution->soluce); free(firstSolution);
+            free(secondSolution->fraction); free(secondSolution->soluce);free(secondSolution);
         }
         else if (nbSolution == 0){
             printf("Discriminant is 0, the solution is:\n");
@@ -806,12 +868,16 @@ void equation(char *s){
         }
         else if (nbSolution == -1){
             printf("The two complexes number are:\n");
-            char *firstcomplexSolution = solutionNegatifSecondDegree(data, delta + 1, 1);
-            printf("%s\n" ,firstcomplexSolution);
-            char *secondcomplexSolution = solutionNegatifSecondDegree(data, delta + 1, 2);
-            printf("%s\n" ,secondcomplexSolution);
-            free(firstcomplexSolution);
-            free(secondcomplexSolution);
+            struct solucediv *firstcomplexSolution = solutionNegatifSecondDegree(data, delta + 1, 1);
+            struct solucediv *secondcomplexSolution = solutionNegatifSecondDegree(data, delta + 1, 2);
+            printf("%s\n" ,firstcomplexSolution->soluce);
+            printf("%s\n" ,secondcomplexSolution->soluce);
+            #ifdef BONUS
+                printf("The two solutions fractions are:\n");
+                printf("%s\n%s\n", firstcomplexSolution->fraction, secondcomplexSolution->fraction);
+            #endif
+            free(firstcomplexSolution->fraction); free(firstcomplexSolution->soluce); free(firstcomplexSolution);
+            free(secondcomplexSolution->fraction); free(secondcomplexSolution->soluce);free(secondcomplexSolution);
         }
         free(delta);
      }
@@ -830,6 +896,3 @@ int main(int argc, char **av){
     equation(av[1]);
     return 0;
 }
-
-    // #ifdef BONUS
-    // #endif

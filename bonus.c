@@ -19,6 +19,51 @@ static size_t sizeNumberInt(char *s){
     return i;
 }
 
+void displayCalcul(char *val1, char *val2, int degree, char sign){
+    printf("Calcul : ");
+    if (degree == 0){
+        printf("%s %c %s\n", val1, sign, val2);
+    }else if(degree == 1){
+        printf("%sX %c %sX\n", val1, sign, val2);
+    }else{
+        printf("%sX^%d %c %sX^%d\n",val1, degree, sign, val2, degree);
+    }
+}
+
+void  displayDataBonus(struct values *data, bool reduce){
+    struct values *tmp = data;
+    struct values *tmp2 = NULL;
+    size_t i = 0;
+    if (reduce == true) printf("Reduced form: ");
+    else {
+        printf("Intermediate Step  ");
+    }
+    while (tmp != NULL){
+        tmp2 = tmp;
+        if (i == 0 && tmp->val[0] == '='){
+            printf("0 %s ", tmp->val);
+        }
+        else if(tmp->val[0] == '='){
+            printf("%s ", tmp->val);
+        }
+        else if(tmp->val[0] >= '0' && tmp->val[0] <= '9'){
+            if (tmp->degree == 0){printf("%s ", tmp->val);}
+            else if(tmp->degree == 1){
+                printf("%sX ", tmp->val);
+            }else printf ("%sX^%d ", tmp->val, tmp->degree);
+        }
+        else{
+            printf("%s ", tmp->val);
+        }
+        tmp = tmp->next;
+        i++;
+    }
+    if (tmp2->val[0] == '='){
+        printf("0 ");
+    }
+    printf("\n");
+}
+
 static size_t checkNumber(char *s){
     bool isPoint = false;
     size_t i = 0;
@@ -212,8 +257,12 @@ struct values * parseDataBonus(char *s){
                 if (s[i] == '*'){
                     i++;
                     while (s[i] == 32) i++;
+                }if (s[i] != 'X' ){
+                    while (s[i] != '*') i--;
+                    i--;
+                
                 }
-                if (s[i + 1] != '^'){
+                else if (s[i] == 'X' && s[i + 1] != '^'){
                     tmp->degree = 1;
                 }else{
                     i += 2;
@@ -241,7 +290,8 @@ struct values * parseDataBonus(char *s){
                 tmp->next = NULL;
                 tmp->prev = tmpData;
             }
-        }else if(s[i] == 'X'){
+        }
+        else if(s[i] == 'X'){
             struct values *tmp = malloc(sizeof(struct values));
             tmp->display = NULL;
             tmp->side = side;
@@ -251,27 +301,18 @@ struct values * parseDataBonus(char *s){
             tmpVal[1] = '\0';
             tmp->val = tmpVal;
             i++;
-            while(s[i] == 32) i++;
-            if (s[i] != '*' && s[i] != 'X'){tmp->degree = 0; --i;}
+            if (s[i] != '^'){tmp->degree = 0; --i;}
             else{
-                if (s[i] == '*'){
-                    i++;
-                    while (s[i] == 32) i++;
+                i++;
+                size_t sizeNumber = sizeNumberInt(s + i);
+                char *tmpVal2 = malloc(sizeof(char) * (sizeNumber + 1));
+                tmpVal2[sizeNumber] = '\0';
+                for (size_t j = 0; j < sizeNumber; j++){
+                    tmpVal2[j] = s[i + j];
                 }
-                if (s[i + 1] != '^'){
-                    tmp->degree = 1;
-                }else{
-                    i += 2;
-                    size_t sizeNumber = sizeNumberInt(s + i);
-                    char *tmpVal2 = malloc(sizeof(char) * (sizeNumber + 1));
-                    tmpVal2[sizeNumber] = '\0';
-                    for (size_t j = 0; j < sizeNumber; j++){
-                        tmpVal2[j] = s[i + j];
-                    }
-                    tmp->degree = atoi(tmpVal2);
-                    free(tmpVal2);
-                    i += sizeNumber - 1;
-                }
+                tmp->degree = atoi(tmpVal2);
+                free(tmpVal2);
+                i += sizeNumber - 1;
             }
             if (data == NULL){
                 data = tmp;

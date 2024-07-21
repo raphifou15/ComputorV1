@@ -35,7 +35,7 @@ int     numberBigerLowerEqual(char *s1, char *s2);
 char*   add(char *s1, char *s2);
 char*   sub(char *s1, char *s2);
 char*   mul(char *s1, char *s2);
-char*   divi(char *s1, char *s2);
+char*   divi(char *s1, char *s2, bool fraction);
 char*   squareRoot(char *s);
 
 
