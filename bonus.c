@@ -205,23 +205,28 @@ struct values * parseDataBonus(char *s){
         if (s[i] == 32){continue;}
         else if(s[i] == '/' || s[i] == '*' || s[i] == '+' || s[i] == '-'){
             struct values *tmp = malloc(sizeof(struct values));
+            if (tmp == NULL) return NULL;
             tmp->display = NULL;
             tmp->side = side;
             if (s[i] == '+'){
                    tmp->sign = 1;
                    tmp->val = strdup("+");
+                   if (tmp->val == NULL) {free(tmp); return NULL;}
             }
             else if (s[i] == '-'){
                 tmp->sign = 2;
                 tmp->val = strdup("-");
+                if (tmp->val == NULL) {free(tmp); return NULL;}
             }
             else if (s[i] == '*'){
                 tmp->sign = 3;
                 tmp->val = strdup("*");
+                if (tmp->val == NULL) {free(tmp); return NULL;}
             }
             else if (s[i] == '/'){
                 tmp->sign = 4;
                 tmp->val = strdup("/");
+                if (tmp->val == NULL) {free(tmp); return NULL;}
             }
             tmp->degree = -1;
             if (data == NULL){
@@ -239,11 +244,13 @@ struct values * parseDataBonus(char *s){
             }
         } else if (s[i] <= '9' && s[i] >= '0'){
             struct values *tmp = malloc(sizeof(struct values));
+            if (tmp == NULL) return NULL;
             tmp->display = NULL;
             tmp->side = side;
             tmp->sign = 0;
             size_t sizeNumber = sizeNumberFloat(s + i);
             char *tmpVal = malloc(sizeof(char) * (sizeNumber + 1));
+            if (tmpVal == NULL){free(tmp); return NULL;}
             tmpVal[sizeNumber] = '\0';
             for (size_t j = 0; j < sizeNumber; j++){
                 tmpVal[j] = s[i + j];
@@ -268,6 +275,7 @@ struct values * parseDataBonus(char *s){
                     i += 2;
                     sizeNumber = sizeNumberInt(s + i);
                     char *tmpVal2 = malloc(sizeof(char) * (sizeNumber + 1));
+                    if (tmpVal2 == NULL){free(tmpVal); free(tmp); return NULL;}
                     tmpVal2[sizeNumber] = '\0';
                     for (size_t j = 0; j < sizeNumber; j++){
                         tmpVal2[j] = s[i + j];
@@ -293,10 +301,12 @@ struct values * parseDataBonus(char *s){
         }
         else if(s[i] == 'X'){
             struct values *tmp = malloc(sizeof(struct values));
+            if (tmp == NULL) return NULL;
             tmp->display = NULL;
             tmp->side = side;
             tmp->sign = 0;
             char *tmpVal = malloc(sizeof(char) * (2));
+            if (tmpVal == NULL) {free(tmp); return NULL;}
             tmpVal[0] = '1';
             tmpVal[1] = '\0';
             tmp->val = tmpVal;
@@ -306,6 +316,7 @@ struct values * parseDataBonus(char *s){
                 i++;
                 size_t sizeNumber = sizeNumberInt(s + i);
                 char *tmpVal2 = malloc(sizeof(char) * (sizeNumber + 1));
+                if (tmpVal2 == NULL){free(tmpVal); free(tmp); return NULL;}
                 tmpVal2[sizeNumber] = '\0';
                 for (size_t j = 0; j < sizeNumber; j++){
                     tmpVal2[j] = s[i + j];
@@ -330,12 +341,14 @@ struct values * parseDataBonus(char *s){
         }
         else if (s[i] == '='){
             struct values *tmp = malloc(sizeof(struct values));
+            if (tmp == NULL) return NULL;
             tmp->display = NULL;
             tmp->side = 2;
             side++;
             tmp->sign = 0;
             tmp->degree = -1;
             char *tmp2 = strdup("=");
+            if (tmp2 == NULL) {free(tmp); return NULL;}
             tmp->val = tmp2;
              if (data == NULL){
                 data = tmp;

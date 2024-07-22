@@ -13,6 +13,16 @@ static size_t sizeNumberFloat(char *s){
     return i;
 }
 
+void freeData(struct values *data){
+    struct values *tmp = data;
+    tmp = data;
+    while (tmp != NULL){
+        struct values *tmp2 = tmp;
+        tmp = tmp->next;
+        if (tmp2->val != NULL) free(tmp2->val);
+        free(tmp2);
+    }
+}
 
 static size_t checkNumberInt(char *s){
     size_t i = 0;
@@ -135,23 +145,28 @@ struct values * parseData(char *s){
         if (s[i] == 32){continue;}
         else if(s[i] == '/' || s[i] == '*' || s[i] == '+' || s[i] == '-'){
             struct values *tmp = malloc(sizeof(struct values));
+            if (tmp == NULL) {freeData(data); return NULL;}
             tmp->display = NULL;
             tmp->side = side;
             if (s[i] == '+'){
                    tmp->sign = 1;
                    tmp->val = strdup("+");
+                   if (tmp->val == NULL) {free(tmp); freeData(data); return NULL;}
             }
             else if (s[i] == '-'){
                 tmp->sign = 2;
                 tmp->val = strdup("-");
+                if (tmp->val == NULL) {free(tmp); freeData(data); return NULL;}
             }
             else if (s[i] == '*'){
                 tmp->sign = 3;
                 tmp->val = strdup("*");
+                if (tmp->val == NULL) {free(tmp); freeData(data); return NULL;}
             }
             else if (s[i] == '/'){
                 tmp->sign = 4;
                 tmp->val = strdup("/");
+                if (tmp->val == NULL) {free(tmp); freeData(data); return NULL;}
             }
             tmp->degree = -1;
             if (data == NULL){
@@ -169,11 +184,13 @@ struct values * parseData(char *s){
             }
         } else if (s[i] <= '9' && s[i] >= '0'){
             struct values *tmp = malloc(sizeof(struct values));
+            if (tmp == NULL) {freeData(data); return NULL;}
             tmp->display = NULL;
             tmp->side = side;
             tmp->sign = 0;
             size_t sizeNumber = sizeNumberFloat(s + i);
             char *tmpVal = malloc(sizeof(char) * (sizeNumber + 1));
+            if (tmpVal == NULL) {free(tmp); freeData(data); return NULL;}
             tmpVal[sizeNumber] = '\0';
             for (size_t j = 0; j < sizeNumber; j++){
                 tmpVal[j] = s[i + j];
@@ -183,6 +200,7 @@ struct values * parseData(char *s){
             i += 5;
             sizeNumber = checkNumberInt(s + i);
             char *tmpVal2 = malloc(sizeof(char) * (sizeNumber + 1));
+            if (tmpVal2 == NULL) {free(tmp); free(tmpVal); freeData(data); return NULL;}
             tmpVal2[sizeNumber] = '\0';
             for (size_t j = 0; j < sizeNumber; j++){
                 tmpVal2[j] = s[i + j];
@@ -205,12 +223,14 @@ struct values * parseData(char *s){
             }
         } else if (s[i] == '='){
             struct values *tmp = malloc(sizeof(struct values));
+            if (tmp == NULL) {freeData(data); return NULL;}
             tmp->display = NULL;
             tmp->side = 2;
             side++;
             tmp->sign = 0;
             tmp->degree = -1;
             char *tmp2 = strdup("=");
+            if (tmp2 == NULL){free(tmp); freeData(data); return NULL;}
             tmp->val = tmp2;
              if (data == NULL){
                 data = tmp;
@@ -239,8 +259,10 @@ struct values *multiplicationAndDivisionData(struct values *data){
                 displayCalcul(tmp->prev->val, tmp->next->val, tmp->prev->degree, '*');
             #endif
             char *val = mul(tmp->prev->val, tmp->next->val);
+            if (val == NULL) return NULL;
             int degree = tmp->prev->degree + tmp->next->degree;
             struct values *new = malloc(sizeof(struct values));
+            if (new == NULL) {free(val); return NULL;}
             new->side = tmp->side;
             new->sign = 0;
             new->degree = degree;
@@ -285,8 +307,10 @@ struct values *multiplicationAndDivisionData(struct values *data){
                 displayCalcul(tmp->prev->val, tmp->next->val, tmp->prev->degree, '/');
             #endif
             char *val = divi(tmp->prev->val, tmp->next->val, false);
+            if (val == NULL) return NULL;
             int degree = tmp->prev->degree - tmp->next->degree;
             struct values *new = malloc(sizeof(struct values));
+            if (new == NULL) {free(val); return NULL;}
             new->side = tmp->side;
             new->sign = 0;
             new->degree = degree;
@@ -335,7 +359,6 @@ struct values *multiplicationAndDivisionData(struct values *data){
 
 struct values * additionAndSubtractionData(struct values *data){
     struct values *tmp = data;
-    // struct values *tmpStrut;
     size_t i = 0;
     while (tmp != NULL){
         if (tmp->val[0] >= '0' && tmp->val[0] <= '9'){
@@ -345,10 +368,13 @@ struct values * additionAndSubtractionData(struct values *data){
                     char *valtmp = NULL;
                     if (i == 0){
                         valtmp = strdup(tmp->val);
+                        if (valtmp == NULL) return NULL;
                     }else if (tmp->prev->val[0] == '-'){
                         valtmp = join("-", tmp->val);
+                        if (valtmp == NULL) return NULL;
                     }else{
                         valtmp = strdup(tmp->val);
+                        if (valtmp == NULL) return NULL;
                     }
                     /////////// FAIRE ADDITION OU SOUSTRACTION //////////
                     char *val = NULL;
@@ -358,11 +384,13 @@ struct values * additionAndSubtractionData(struct values *data){
                                 displayCalcul(valtmp, tmp2->val, tmp2->degree, '-');
                             #endif
                             val = sub(valtmp, tmp2->val);
+                            if (val == NULL) {free(valtmp); return NULL;}
                         }else{
                             #ifdef BONUS
                                 displayCalcul(valtmp, tmp2->val, tmp2->degree, '+');
                             #endif
                             val = add(valtmp, tmp2->val);
+                            if (val == NULL) {free(valtmp); return NULL;}
                         }
                     }else{
                         if (tmp2->side == tmp->side){
@@ -370,20 +398,24 @@ struct values * additionAndSubtractionData(struct values *data){
                                 displayCalcul(valtmp, tmp2->val, tmp2->degree, '+');
                             #endif
                             val = add(valtmp, tmp2->val);
+                            if (val == NULL) {free(valtmp); return NULL;}
                         }else{
                             #ifdef BONUS
                                 displayCalcul(valtmp, tmp2->val, tmp2->degree, '-');
                             #endif
                             val = sub(valtmp, tmp2->val);
+                            if (val == NULL) {free(valtmp); return NULL;}
                         }
                     }
                     free(valtmp);
                     if (val[0] == '-' && i == 0){
                         struct values *new = malloc(sizeof(struct values));
+                        if (new == NULL){free(val); return NULL;}
                         new->degree = -1;
                         new->side = 0;
                         new->sign = 2;
                         new->val = strdup("-");
+                        if (new->val == NULL) {free(val); free(new); return NULL;}
                         new->prev = NULL;
                         new->next = data;
                         data->prev = new;
@@ -392,10 +424,12 @@ struct values * additionAndSubtractionData(struct values *data){
                     }
                     else if (val[0] == '-' && tmp->prev->val[0] == '='){
                         struct values *new = malloc(sizeof(struct values));
+                        if (new == NULL){free(val); return NULL;}
                         new->degree = -1;
                         new->side = 1;
                         new->sign = 2;
                         new->val = strdup("-");
+                        if (new->val == NULL) {free(val); free(new); return NULL;}
                         struct values *tmp3 = tmp->prev;
                         tmp3->next = new;
                         new->prev = tmp3;
@@ -410,6 +444,7 @@ struct values * additionAndSubtractionData(struct values *data){
                     if (val[0] == '-'){
                         tmp->val = strdup(val + 1);
                         free(val);
+                        if (tmp->val == NULL){ return NULL;}
                     }else{
                         tmp->val = val;
                     }
@@ -521,14 +556,16 @@ struct values * putDataOnLeftSide(struct values *data){
         }
         else if (tmp->val[0] >= '0' && tmp->val[0] <= '9' && tmp->side == 1 && tmp->prev->val[0] == '='){
             struct values *tmp2 = tmp->next;
-             struct values *new = malloc(sizeof(struct values));
-                char *val = malloc(sizeof(char) * 2);
-                val[0] = '-';
-                val[1] = '\0';
-                new->degree = -1;
-                new->side = 0;
-                new->sign = 2;
-                new->val = val;
+            struct values *new = malloc(sizeof(struct values));
+            if (new == NULL) return NULL;
+            char *val = malloc(sizeof(char) * 2);
+            if (val == NULL) {free(new); return NULL;}
+            val[0] = '-';
+            val[1] = '\0';
+            new->degree = -1;
+            new->side = 0;
+            new->sign = 2;
+            new->val = val;
             if (equal->prev == NULL){
                 data = new;
                 new->prev = NULL;
@@ -556,8 +593,6 @@ struct values * putDataOnLeftSide(struct values *data){
     return data;
 }
 
-
-
 int degreeEquation(struct values *data){
     struct values *tmp = data;
     int degree = 0;
@@ -579,6 +614,7 @@ void solutionOneDegreeEquation(struct values *data){
         if (tmp->degree == 0){
             if (tmp->prev == NULL || tmp->prev->val[0] != '-'){
                 num = join("-", tmp->val);
+                if (num == NULL) return;
                 free(tmp->val);
                 tmp->val = num;
             }
@@ -591,6 +627,7 @@ void solutionOneDegreeEquation(struct values *data){
                 div = tmp->val;
             }else if (tmp->prev->val[0] == '-'){
                 div = join("-", tmp->val);
+                if (div == NULL) return ;
                 free(tmp->val);
                 tmp->val = div;
             }
@@ -599,9 +636,11 @@ void solutionOneDegreeEquation(struct values *data){
     }
     // printf("num = %s  div = %s\n", num, div);
     char *res = divi(num, div, false);
+    if (res == NULL) return;
     printf("%s\n", res);
     #ifdef BONUS
         char *res2 = divi(num, div, true);
+        if (res2 == NULL){free(res); return;}
         printf("res fraction: %s\n", res2);
         free(res2);
     #endif
@@ -621,34 +660,43 @@ char *calculDelta(struct values *data){
         if (tmp->degree == 2){
             if (tmp->prev == NULL || tmp->prev->val[0] == '+'){
                 vala = strdup(tmp->val);
+                if (vala == NULL) return NULL;
             }
             else{
                 vala = join("-", tmp->val);
+                if (vala == NULL) return NULL;
             }
         }
-        if (tmp->degree == 1){
+        else if (tmp->degree == 1){
             if (tmp->prev == NULL || tmp->prev->val[0] == '+'){
                 valb = strdup(tmp->val);
+                if (valb == NULL) return NULL;
             }
             else{
                 valb = join("-", tmp->val);
+                if (valb == NULL) return NULL;
             }
         }
-        if (tmp->degree == 0){
+        else if (tmp->degree == 0){
             if (tmp->prev == NULL || tmp->prev->val[0] == '+'){
                 valc = strdup(tmp->val);
+                if (valc == NULL) return NULL;
             }
             else{
                 valc = join("-", tmp->val);
+                if (valc == NULL) return NULL;
             }
         }
         tmp = tmp->next;
     }
     char  *bcaree = mul(valb, valb);
+    if (bcaree == NULL){free(vala); free(valb); free(valc);}
     
     char  *ac = mul(vala, valc);
+    if (ac == NULL){free(vala); free(valb); free(valc); free(bcaree);}
   
     char  *quatreAC = mul("4", ac);
+    if (quatreAC == NULL){free(vala); free(valb); free(valc); free(bcaree); free(ac);}
    
     delta = sub(bcaree, quatreAC);
     free(vala); free(valb); free(valc); free(bcaree); free(ac); free(quatreAC);
@@ -680,22 +728,35 @@ struct solucediv *solutionPositifSecondDegree(struct values *data, char *delta, 
         tmp = tmp->next;
     }
 
+    if (vala == NULL || valb == NULL){
+        if (vala != NULL) free(vala);
+        if (valb != NULL) free(valb);
+        return NULL;
+    }
+
     char *doublea = mul("2", vala);
+    if (doublea == NULL){free(vala); free(valb); return NULL;}
     char *rdelta = squareRoot(delta);
+    if (rdelta == NULL){free(vala); free(valb);free(doublea);return NULL;}
     char *tmp2 = NULL;
     if (l == 1) tmp2 = sub(valb, rdelta);
     else tmp2 = add(valb, rdelta);
+    if (tmp2 == NULL){free(vala); free(valb);free(doublea); free(rdelta);return NULL;}
     soluce = divi(tmp2, doublea, false);
+    if (soluce == NULL){free(vala); free(valb);free(doublea); free(rdelta); free(tmp2);return NULL;}
     char *fraction = divi(tmp2, doublea, true);
+    if (fraction == NULL){free(vala); free(valb);free(doublea); free(rdelta); free(tmp2); free(soluce); return NULL;}
     free(doublea); free(rdelta); free(tmp2);free(vala); free(valb);
     struct solucediv *s = malloc(sizeof(struct solucediv));
+    if (s == NULL){free(soluce); free(fraction); return NULL;}
     s->soluce = soluce;
     s->fraction = fraction;
     return s;
 }
 
-char *solutionEqualZeroSecondDegree(struct values *data){
+struct solucediv *solutionEqualZeroSecondDegree(struct values *data){
     char *soluce = NULL;
+    char *fraction = NULL;
     char *vala = NULL;
     char *valb = NULL;
     struct values *tmp = data;
@@ -718,10 +779,23 @@ char *solutionEqualZeroSecondDegree(struct values *data){
         }
         tmp = tmp->next;
     }
+    if (vala == NULL || valb == NULL){
+        if (vala != NULL) free(vala);
+        if (valb != NULL) free(valb);
+        return NULL;
+    }
     char *doublea = mul("2", vala);
+    if (doublea == NULL){free(vala); free(valb); return NULL;}
     soluce = divi(valb, doublea, false);
+    if (soluce == NULL) {free(vala); free(valb); free(doublea); return NULL;}
+    fraction = divi(valb, doublea, true);
+    if (fraction == NULL){free(vala); free(valb); free(doublea); free(soluce); return NULL;}
     free(vala); free(valb); free(doublea);
-    return soluce;
+    struct solucediv *s = malloc(sizeof(struct solucediv));
+    if (s == NULL){free(soluce); free(fraction); return NULL;}
+    s->soluce = soluce;
+    s->fraction = fraction;
+    return s;
 }
 
 bool checkIfEquationPossible(struct values *data){
@@ -760,32 +834,67 @@ struct solucediv *solutionNegatifSecondDegree(struct values *data, char *delta, 
         }
         tmp = tmp->next;
     }
+    if (vala == NULL || valb == NULL){
+        if (vala != NULL) free(vala);
+        if (valb != NULL) free(valb);
+        return NULL;
+    }
     char *doublea = mul("2", vala);
+    if (doublea == NULL){free(vala); free(valb); return NULL;}
     char *rdelta = squareRoot(delta);
+    if (rdelta == NULL){free(vala); free(valb); free(doublea); return NULL;}
     char *div1 = divi(valb, doublea, false);
+    if (div1 == NULL){free(vala); free(valb); free(doublea); free(rdelta); return NULL;}
     char *div2 = divi(rdelta, doublea, false);
-
+    if (div2 == NULL){free(vala); free(valb); free(doublea); free(rdelta); free(div1); return NULL;}
     char *div1B = divi(valb, doublea, true);
+    if (div1B == NULL){free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); return NULL;}
     char *div2B = divi(rdelta, doublea, true);
+    if (div2B == NULL){free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B); return NULL;}
     
     if (l == 1){
         char *reu1 = join(div1, " - i * ");
+        if (reu1 == NULL){
+            free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B);free(div2B); return NULL;
+        }
         soluce = join(reu1, div2);
+        if (soluce == NULL){
+            free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B);free(div2B); free(reu1); return NULL;
+        }
         free(reu1);
         char *reu1B = join(div1B, " - i * ");
+        if (reu1B == NULL){
+            free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B);free(div2B); return NULL;
+        }
         fraction = join(reu1B, div2B);
+        if (fraction == NULL){
+            free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B);free(div2B);free(reu1B); return NULL;
+        }
         free(reu1B);
         
     } else if (l != 1){
         char *reu1 = join(div1, " + i * ");
+        if (reu1 == NULL){
+            free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B);free(div2B); return NULL;
+        }
         soluce = join(reu1, div2);
         free(reu1);
+        if (soluce == NULL){
+            free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B);free(div2B); return NULL;
+        }
         char *reu1B = join(div1B, " + i * ");
+        if (reu1B == NULL){
+            free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B);free(div2B); return NULL;
+        }
         fraction = join(reu1B, div2B);
         free(reu1B);
+        if (fraction == NULL){
+            free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B);free(div2B); return NULL;
+        }
     }
     free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B); free(div2B);
     struct solucediv *s = malloc(sizeof(struct solucediv));
+    if (s == NULL){free(soluce);free(fraction);return NULL;}
     s->fraction = fraction;
     s->soluce = soluce; 
     return s;
@@ -799,12 +908,15 @@ void equation(char *s){
         return;
     }
     data = parseData(s);
+    if (data == NULL) return;
+
     #endif
     #ifdef BONUS
         if (isSyntaxErrorBonus(s) == false){
             return;
         }
         data = parseDataBonus(s);
+        if (data == NULL) return;
         // while (data != NULL){
         //     printf("%s ",data->val);
         //     data = data->next; 
@@ -814,21 +926,32 @@ void equation(char *s){
     #endif
     
     // creer une fonction qui fait les multiplications de chaque coter.
-    data = multiplicationAndDivisionData(data);
+    struct values  *temp = NULL;
+    temp = multiplicationAndDivisionData(data);
+    if (temp == NULL){freeData(data); return ;}
+    data = temp;
     // displayData(data);
     // return;
     // creer une fonction qui fait les additions et soustraction de chaque coter.
-    data = additionAndSubtractionData(data);
+    temp = additionAndSubtractionData(data);
+    if (temp == NULL){freeData(data); return;}
+    data = temp;
     // creer une fonction qui met tous les nombres du coter gauche.
-    data = putDataOnLeftSide(data);
+    temp = putDataOnLeftSide(data);
+    if (temp == NULL){freeData(data); return;}
+    data = temp;
     // creer une fonction qui affiche la version reduite de l'equation
     #ifdef BONUS
-        data = supprimZeroOfData(data);
+        temp = supprimZeroOfData(data);
+        if (temp == NULL){freeData(data); return;}
+        data = temp;
         displayDataBonus(data, true);
     #endif
     #ifndef BONUS
         displayData(data);
-        data = supprimZeroOfData(data);
+        temp = supprimZeroOfData(data);
+        if (temp == NULL){freeData(data); return;}
+        data = temp;
     #endif
     // creer une fonction qui deduit le degrees de l'equation.
     int degree = degreeEquation(data);
@@ -847,12 +970,15 @@ void equation(char *s){
     // si equation second degree.
      if (degree == 2){
         char *delta = calculDelta(data);
+        if (delta == NULL){freeData(data); return;}
         printf("delta = %s\n", delta);
         int nbSolution = numberBigerLowerEqual(delta, "0");
         if (nbSolution == 1){
             printf("Discriminant is strictly positive\nThe two solutions are:\n");
             struct solucediv *firstSolution = solutionPositifSecondDegree(data, delta, 1);
+            if (firstSolution == NULL){free(delta); freeData(data); return;}
             struct solucediv *secondSolution = solutionPositifSecondDegree(data, delta, 2);
+            if (secondSolution == NULL){free(delta); freeData(data); return;}
             printf("%s\n%s\n", firstSolution->soluce, secondSolution->soluce);
             #ifdef BONUS
                 printf("The two solutions fractions are:\n");
@@ -863,8 +989,13 @@ void equation(char *s){
         }
         else if (nbSolution == 0){
             printf("Discriminant is 0, the solution is:\n");
-            char *solution = solutionEqualZeroSecondDegree(data);
-            printf("%s\n", solution);
+            struct solucediv *s = solutionEqualZeroSecondDegree(data);
+            if (s == NULL){free(delta); freeData(data); return;}
+            printf("%s\n", s->soluce);
+            #ifdef BONUS
+                printf("res fraction %s\n", s->fraction);
+            #endif
+            free(s->soluce); free(s->fraction); free(s);
         }
         else if (nbSolution == -1){
             printf("The two complexes number are:\n");
@@ -886,7 +1017,7 @@ void equation(char *s){
     while (tmp != NULL){
         struct values *tmp2 = tmp;
         tmp = tmp->next;
-        free(tmp2->val);
+        if (tmp2->val != NULL) free(tmp2->val);
         free(tmp2);
     }
 }

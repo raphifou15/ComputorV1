@@ -272,6 +272,7 @@ static char *div_number(char *s1, char *s2, bool isneg, bool fraction){
     if (strcmp(dcv.ns2, "0") == 0){
         free(dcv.ns1);
         free(dcv.ns2);
+        fprintf(stderr,"Error dividing by zero impossible\n");
         return NULL;
     }
     if (strcmp(dcv.ns2, "1") == 0){

@@ -13,6 +13,8 @@ struct values{
     struct values   *prev;
 };
 
+void freeData(struct values *data);
+
 #ifdef BONUS
 void   bonusActivate(void);
 bool   isSyntaxErrorBonus(char *s);
