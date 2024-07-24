@@ -33,10 +33,11 @@ ${NAME_BONUS}:${BONUS_OBJ}
 clean:
 	make clean -C math
 	${RM} *.o
+	${RM} -R obj
 
 fclean: clean
 	make fclean -C math
 	${RM} ${NAME}
 	${RM} ${NAME_BONUS}
-
+	
 re: fclean all

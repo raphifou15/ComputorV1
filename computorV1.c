@@ -660,11 +660,14 @@ char *calculDelta(struct values *data){
         if (tmp->degree == 2){
             if (tmp->prev == NULL || tmp->prev->val[0] == '+'){
                 vala = strdup(tmp->val);
-                if (vala == NULL) return NULL;
             }
             else{
                 vala = join("-", tmp->val);
-                if (vala == NULL) return NULL;
+            }
+            if (vala == NULL){
+                if (valb != NULL) free(valb);
+                if (valc != NULL) free(valc);
+                return NULL;
             }
         }
         else if (tmp->degree == 1){
@@ -676,6 +679,11 @@ char *calculDelta(struct values *data){
                 valb = join("-", tmp->val);
                 if (valb == NULL) return NULL;
             }
+            if (valb == NULL){
+                if (vala != NULL) free(vala);
+                if (valc != NULL) free(valc);
+                return NULL;
+            }
         }
         else if (tmp->degree == 0){
             if (tmp->prev == NULL || tmp->prev->val[0] == '+'){
@@ -686,8 +694,22 @@ char *calculDelta(struct values *data){
                 valc = join("-", tmp->val);
                 if (valc == NULL) return NULL;
             }
+            if (valc == NULL){
+                if (vala != NULL) free(vala);
+                if (valb != NULL) free(valb);
+                return NULL;
+            }
         }
         tmp = tmp->next;
+    }
+    if (vala == NULL){
+        vala = strdup("0");
+    }
+    if (valb == NULL){
+        valb = strdup("0");
+    }
+    if (valc == NULL){
+        valc = strdup("0");
     }
     char  *bcaree = mul(valb, valb);
     if (bcaree == NULL){free(vala); free(valb); free(valc);}
@@ -716,6 +738,10 @@ struct solucediv *solutionPositifSecondDegree(struct values *data, char *delta, 
             else{
                 vala = join("-", tmp->val);
             }
+            if (vala == NULL){
+                if (valb != NULL) free(valb);
+                return NULL;
+            }
         }
         if (tmp->degree == 1){
             if (tmp->prev == NULL || tmp->prev->val[0] == '+'){
@@ -724,16 +750,30 @@ struct solucediv *solutionPositifSecondDegree(struct values *data, char *delta, 
             else{
                 valb = strdup(tmp->val);
             }
+            if (valb == NULL){
+                if (vala != NULL) free(vala);
+                return NULL;
+            }
         }
+        
         tmp = tmp->next;
     }
 
-    if (vala == NULL || valb == NULL){
-        if (vala != NULL) free(vala);
-        if (valb != NULL) free(valb);
-        return NULL;
+    if (vala == NULL){
+        vala = strdup("0");
+        if (vala == NULL){
+            if (valb != NULL) free(valb);
+            return NULL;
+        }
     }
-
+    if (valb == NULL){
+        valb = strdup("0");
+        if (valb == NULL){
+            if (vala != NULL) free(vala);
+            return NULL;
+        }
+    }
+    
     char *doublea = mul("2", vala);
     if (doublea == NULL){free(vala); free(valb); return NULL;}
     char *rdelta = squareRoot(delta);
@@ -768,6 +808,10 @@ struct solucediv *solutionEqualZeroSecondDegree(struct values *data){
             else{
                 vala = join("-", tmp->val);
             }
+            if (vala == NULL){
+                if (valb != NULL) free(valb);
+                return NULL;
+            }
         }
         if (tmp->degree == 1){
             if (tmp->prev == NULL || tmp->prev->val[0] == '+'){
@@ -776,17 +820,31 @@ struct solucediv *solutionEqualZeroSecondDegree(struct values *data){
             else{
                 valb = strdup(tmp->val);
             }
+            if (valb == NULL){
+                if (vala != NULL) free(vala);
+                return NULL;
+            }
         }
         tmp = tmp->next;
     }
-    if (vala == NULL || valb == NULL){
-        if (vala != NULL) free(vala);
-        if (valb != NULL) free(valb);
-        return NULL;
+    if (vala == NULL){
+        vala = strdup("0");
+        if (vala == NULL){
+            if (valb != NULL) free(valb);
+            return NULL;
+        }
+    }
+    if (valb == NULL){
+        valb = strdup("0");
+        if (valb == NULL){
+            if (vala != NULL) free(vala);
+            return NULL;
+        }
     }
     char *doublea = mul("2", vala);
     if (doublea == NULL){free(vala); free(valb); return NULL;}
     soluce = divi(valb, doublea, false);
+    printf("soluce = %s\n", soluce);
     if (soluce == NULL) {free(vala); free(valb); free(doublea); return NULL;}
     fraction = divi(valb, doublea, true);
     if (fraction == NULL){free(vala); free(valb); free(doublea); free(soluce); return NULL;}
@@ -823,6 +881,10 @@ struct solucediv *solutionNegatifSecondDegree(struct values *data, char *delta, 
             else{
                 vala = join("-", tmp->val);
             }
+            if (vala == NULL){
+                if (valb != NULL) free(valb);
+                return NULL;
+            }
         }
         if (tmp->degree == 1){
             if (tmp->prev == NULL || tmp->prev->val[0] == '+'){
@@ -831,13 +893,26 @@ struct solucediv *solutionNegatifSecondDegree(struct values *data, char *delta, 
             else{
                 valb = strdup(tmp->val);
             }
+            if (valb == NULL){
+                if (vala != NULL) free(vala);
+                return NULL;
+            }
         }
         tmp = tmp->next;
     }
-    if (vala == NULL || valb == NULL){
-        if (vala != NULL) free(vala);
-        if (valb != NULL) free(valb);
-        return NULL;
+    if (vala == NULL){
+        vala = strdup("0");
+        if (vala == NULL){
+            if (valb != NULL) free(valb);
+            return NULL;
+        }
+    }
+    if (valb == NULL){
+        valb = strdup("0");
+        if (valb == NULL){
+            if (vala != NULL) free(vala);
+            return NULL;
+        }
     }
     char *doublea = mul("2", vala);
     if (doublea == NULL){free(vala); free(valb); return NULL;}
@@ -968,10 +1043,10 @@ void equation(char *s){
         solutionOneDegreeEquation(data);
     }
     // si equation second degree.
-     if (degree == 2){
+    else if (degree == 2){
         char *delta = calculDelta(data);
-        if (delta == NULL){freeData(data); return;}
         printf("delta = %s\n", delta);
+        if (delta == NULL){freeData(data); return;}
         int nbSolution = numberBigerLowerEqual(delta, "0");
         if (nbSolution == 1){
             printf("Discriminant is strictly positive\nThe two solutions are:\n");

@@ -266,6 +266,21 @@ static char *div_number(char *s1, char *s2, bool isneg, bool fraction){
     }
     
     if (strcmp(dcv.ns1, "0") == 0){
+        if (fraction == true){
+            char *tmp = join(dcv.ns1, " / ");
+            if (tmp == NULL){free(dcv.ns1); free(dcv.ns2); return NULL;}
+            char *res = join(tmp, dcv.ns2);
+            if (res == NULL){free(tmp); free(dcv.ns1); free(dcv.ns2); return NULL;}
+            free(tmp);
+            if (isneg == true){
+                char *resneg = join("-", res);
+                if (resneg == NULL){free(res); free(dcv.ns1); free(dcv.ns2); return NULL;}
+                free(res); free(dcv.ns1); free(dcv.ns2);
+                return resneg;
+            }
+            free(dcv.ns1); free(dcv.ns2);
+            return res;
+        }
         free(dcv.ns2);
         return dcv.ns1;
     }
@@ -328,8 +343,10 @@ static char *div_number(char *s1, char *s2, bool isneg, bool fraction){
     else{
         if (fraction == true){
             char *a = join(dcv.ns1, " / ");
+            if (a == NULL) {free(dcv.ns1); free(dcv.ns2); free(save); return NULL;}
             char *res = join(a, dcv.ns2);
             free(dcv.ns1); free(dcv.ns2); free(a); free(save);
+            if (res == NULL){return NULL;}
             if (isneg == true){
                 char *resn = join("-", res);
                 free(res);
@@ -359,8 +376,14 @@ static char *div_number(char *s1, char *s2, bool isneg, bool fraction){
             return res;
         }else{
             char *a = join(save, " / ");
+            if (a == NULL){
+                free(dividende); free(dcv.ns1); free(dcv.ns2); free(save); return NULL;
+            }
             char *res = join(a, dcv.ns2);
             free(a); free(dividende); free(dcv.ns1); free(dcv.ns2); free(save);
+            if (res == NULL){
+                return NULL;
+            }
             if (isneg == true){
                 char *resn = join("-", res);
                 free(res);
