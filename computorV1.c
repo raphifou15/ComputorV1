@@ -636,7 +636,12 @@ void solutionOneDegreeEquation(struct values *data){
         tmp = tmp->next;
     }
     // printf("num = %s  div = %s\n", num, div);
-    char *res = divi(num, div, false);
+    char *res = NULL;
+    if (num == NULL){
+        res = divi("0", div, false);
+    }else{
+        res = divi(num, div, false);
+    }
     if (res == NULL) return;
     printf("%s\n", res);
     #ifdef BONUS
