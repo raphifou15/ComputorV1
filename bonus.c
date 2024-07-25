@@ -85,10 +85,15 @@ static size_t checkNumber(char *s){
 
 static size_t checkNumberInt(char *s){
     size_t i = 0;
+    size_t num = 0;
     while (s[i] != '\0' && s[i] != 32){
         if (s[i] < '0' || s[i] > '9')
-            return i;
+            return 0;
+        num *= 10;
+        num += s[i] - 48;
         i++;
+        if (i > 10) return 0;
+        if (num > 2147483647) return 0;
     }
     return i;
 }
