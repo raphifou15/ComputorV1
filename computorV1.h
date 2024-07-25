@@ -2,6 +2,7 @@
 #define COMPUTORV1
 
 #include "math/math.h"
+#include <signal.h>
 
 struct values{
     int             side; //0 left, 1 right, 2 middle;

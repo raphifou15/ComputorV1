@@ -1,5 +1,6 @@
 #include "computorV1.h"
 
+
 struct solucediv{
     char *fraction;
     char *soluce;
@@ -1097,7 +1098,30 @@ void equation(char *s){
     }
 }
 
+char *globalLine = NULL;
+
+void handler(int sig) {
+    if (sig == SIGINT) {
+        if (globalLine != NULL) {
+            free(globalLine);
+            globalLine = NULL;
+        }
+        exit(EXIT_SUCCESS);
+    }
+}
+
 int main(int argc, char **av){
+    if (argc == 1 && (strcmp("./computor", av[0]) || strcmp("./computorBonus", av[0]))){
+        size_t taille = 0;
+        ssize_t longueur;
+        signal(SIGINT, handler);
+        while ((longueur = getline(&globalLine, &taille, stdin)) != -1){
+            globalLine[longueur - 1] = '\0';
+            equation(globalLine);
+        }
+        free(globalLine);
+        return 0;
+    }
     if (argc != 2) return 0;
     equation(av[1]);
     return 0;
