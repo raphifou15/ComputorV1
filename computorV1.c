@@ -845,7 +845,6 @@ struct solucediv *solutionEqualZeroSecondDegree(struct values *data){
     char *doublea = mul("2", vala);
     if (doublea == NULL){free(vala); free(valb); return NULL;}
     soluce = divi(valb, doublea, false);
-    printf("soluce = %s\n", soluce);
     if (soluce == NULL) {free(vala); free(valb); free(doublea); return NULL;}
     fraction = divi(valb, doublea, true);
     if (fraction == NULL){free(vala); free(valb); free(doublea); free(soluce); return NULL;}
