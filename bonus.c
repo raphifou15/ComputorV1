@@ -87,8 +87,14 @@ static size_t checkNumberInt(char *s){
     size_t i = 0;
     size_t num = 0;
     while (s[i] != '\0' && s[i] != 32){
-        if (s[i] < '0' || s[i] > '9')
+        if (s[i] < '0' || s[i] > '9'){
+            if (s[i] == '='){
+                if (i > 10) return 0;
+                if (num > 2147483647) return 0;
+                return i;
+            }
             return 0;
+        }
         num *= 10;
         num += s[i] - 48;
         i++;
@@ -143,7 +149,7 @@ bool isSyntaxErrorBonus(char *s){
             if (s[i] >= '0' && s[i] <= '9'){
                 y = checkNumberInt(s + i);
                 if (y == 0){
-                    fprintf(stderr, "Syntax error\nThere is an error in this equation %s\n %c is a wrong parameter\nPut a number in int for the power", s, s[i]);
+                    fprintf(stderr, "Syntax error\nThere is an error in this equation %s\nPut a number in int for the power", s);
                     return false;
                 }
                 i += y - 1;
