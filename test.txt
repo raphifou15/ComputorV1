@@ -1,0 +1,3 @@
+0 * 4 * X + X^2= X^2 : conditionnal jump
+
+X = 0;

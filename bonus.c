@@ -3,6 +3,15 @@ void   bonusActivate(void){
     printf("bonus is activated\n");
 }
 
+static void initStructValues(struct values *data){
+    data->degree = -1;
+    data->next = NULL;
+    data->prev = NULL;
+    data->side = -5;
+    data->sign = -5;
+    data->val = NULL;
+}
+
 static size_t sizeNumberFloat(char *s){
     size_t i = 0;
     while ((s[i] >= '0' && s[i] <= '9') || s[i] == '.'){
@@ -20,6 +29,7 @@ static size_t sizeNumberInt(char *s){
 }
 
 void displayCalcul(char *val1, char *val2, int degree, char sign){
+    if (val1 == NULL || val2 == NULL) return;
     printf("Calcul : ");
     if (degree == 0){
         printf("%s %c %s\n", val1, sign, val2);
@@ -33,6 +43,7 @@ void displayCalcul(char *val1, char *val2, int degree, char sign){
 void  displayDataBonus(struct values *data, bool reduce){
     struct values *tmp = data;
     struct values *tmp2 = NULL;
+    
     size_t i = 0;
     if (reduce == true) printf("Reduced form: ");
     else {
@@ -40,13 +51,15 @@ void  displayDataBonus(struct values *data, bool reduce){
     }
     while (tmp != NULL){
         tmp2 = tmp;
-        if (i == 0 && tmp->val[0] == '='){
+        if (i == 0 && tmp->val != NULL && tmp->val[0] == '='){
             printf("0 %s ", tmp->val);
+            
         }
-        else if(tmp->val[0] == '='){
+        else if(tmp->val != NULL && tmp->val[0] == '='){
             printf("%s ", tmp->val);
+            
         }
-        else if(tmp->val[0] >= '0' && tmp->val[0] <= '9'){
+        else if(tmp->val != NULL &&  tmp->val[0] >= '0' && tmp->val[0] <= '9'){
             if (tmp->degree == 0){printf("%s ", tmp->val);}
             else if(tmp->degree == 1){
                 printf("%sX ", tmp->val);
@@ -58,7 +71,8 @@ void  displayDataBonus(struct values *data, bool reduce){
         tmp = tmp->next;
         i++;
     }
-    if (tmp2->val[0] == '='){
+    
+    if (tmp2 != NULL && tmp2->val != NULL && tmp2->val[0] == '='){
         printf("0 ");
     }
     printf("\n");
@@ -217,8 +231,11 @@ struct values * parseDataBonus(char *s){
         else if(s[i] == '/' || s[i] == '*' || s[i] == '+' || s[i] == '-'){
             struct values *tmp = malloc(sizeof(struct values));
             if (tmp == NULL) return NULL;
-            tmp->display = NULL;
+            initStructValues(tmp);
             tmp->side = side;
+            tmp->val = NULL;
+            tmp->next = NULL;
+            tmp->prev = NULL;
             if (s[i] == '+'){
                    tmp->sign = 1;
                    tmp->val = strdup("+");
@@ -256,7 +273,10 @@ struct values * parseDataBonus(char *s){
         } else if (s[i] <= '9' && s[i] >= '0'){
             struct values *tmp = malloc(sizeof(struct values));
             if (tmp == NULL) return NULL;
-            tmp->display = NULL;
+            initStructValues(tmp);
+            tmp->val = NULL;
+            tmp->next = NULL;
+            tmp->prev = NULL;
             tmp->side = side;
             tmp->sign = 0;
             size_t sizeNumber = sizeNumberFloat(s + i);
@@ -313,7 +333,10 @@ struct values * parseDataBonus(char *s){
         else if(s[i] == 'X'){
             struct values *tmp = malloc(sizeof(struct values));
             if (tmp == NULL) return NULL;
-            tmp->display = NULL;
+            initStructValues(tmp);
+            tmp->val = NULL;
+            tmp->next = NULL;
+            tmp->prev = NULL;
             tmp->side = side;
             tmp->sign = 0;
             char *tmpVal = malloc(sizeof(char) * (2));
@@ -322,7 +345,7 @@ struct values * parseDataBonus(char *s){
             tmpVal[1] = '\0';
             tmp->val = tmpVal;
             i++;
-            if (s[i] != '^'){tmp->degree = 0; --i;}
+            if (s[i] != '^'){tmp->degree = 1; --i;}
             else{
                 i++;
                 size_t sizeNumber = sizeNumberInt(s + i);
@@ -353,7 +376,10 @@ struct values * parseDataBonus(char *s){
         else if (s[i] == '='){
             struct values *tmp = malloc(sizeof(struct values));
             if (tmp == NULL) return NULL;
-            tmp->display = NULL;
+            initStructValues(tmp);
+            tmp->val = NULL;
+            tmp->next = NULL;
+            tmp->prev = NULL;
             tmp->side = 2;
             side++;
             tmp->sign = 0;

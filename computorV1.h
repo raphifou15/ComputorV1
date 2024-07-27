@@ -9,7 +9,6 @@ struct values{
     int             sign; // 0: pas de sign, 1:+, 2:-, 3:*, 4:/     
     int             degree;
     char            *val;
-    char            *display;
     struct values   *next;
     struct values   *prev;
 };
