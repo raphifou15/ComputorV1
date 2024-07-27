@@ -271,7 +271,7 @@ struct values *multiplicationAndDivisionData(struct values *data){
     while (tmp != NULL){
         if (tmp->val != NULL && tmp->prev != NULL && tmp->val[0] == '*'){
             #ifdef BONUS
-               // if (tmp != NULL && tmp->prev != NULL) displayCalcul(tmp->prev->val, tmp->next->val, tmp->prev->degree, '*');
+               displayCalcul(tmp->prev->val, tmp->next->val, tmp->prev->degree, '*');
             #endif
             char *val = mul(tmp->prev->val, tmp->next->val);
             if (val == NULL) return NULL;
@@ -320,7 +320,7 @@ struct values *multiplicationAndDivisionData(struct values *data){
             }
         }else if (tmp->val[0] == '/'){
             #ifdef BONUS
-               // if (tmp != NULL) displayCalcul(tmp->prev->val, tmp->next->val, tmp->prev->degree, '/');
+               displayCalcul(tmp->prev->val, tmp->next->val, tmp->prev->degree, '/');
             #endif
             char *val = divi(tmp->prev->val, tmp->next->val, false);
             if (val == NULL) return NULL;
@@ -378,7 +378,7 @@ struct values * additionAndSubtractionData(struct values *data){
     struct values *tmp = data;
     size_t i = 0;
     while (tmp != NULL){
-        if (tmp->val != NULL && tmp->prev != NULL && tmp->val[0] >= '0' && tmp->val[0] <= '9'){
+        if (tmp->val != NULL  && tmp->val[0] >= '0' && tmp->val[0] <= '9'){
             struct values *tmp2 = tmp->next;
             while (tmp2 != NULL){
                 if (tmp2->degree == tmp->degree && tmp->sign == tmp2->sign && tmp2->val != NULL && tmp2->val[0] >= '0' && tmp2->val[0] <= '9'){
@@ -398,13 +398,13 @@ struct values * additionAndSubtractionData(struct values *data){
                     if (tmp2->prev->val[0] == '-'){
                         if (tmp2->side == tmp->side){
                             #ifdef BONUS
-                               // if (tmp2 != NULL) displayCalcul(valtmp, tmp2->val, tmp2->degree, '-');
+                               displayCalcul(valtmp, tmp2->val, tmp2->degree, '-');
                             #endif
                             val = sub(valtmp, tmp2->val);
                             if (val == NULL) {free(valtmp); return NULL;}
                         }else{
                             #ifdef BONUS
-                                //if (tmp2 != NULL) displayCalcul(valtmp, tmp2->val, tmp2->degree, '+');
+                                displayCalcul(valtmp, tmp2->val, tmp2->degree, '+');
                             #endif
                             val = add(valtmp, tmp2->val);
                             if (val == NULL) {free(valtmp); return NULL;}
@@ -412,13 +412,13 @@ struct values * additionAndSubtractionData(struct values *data){
                     }else{
                         if (tmp2->side == tmp->side){
                             #ifdef BONUS
-                                // if (tmp2 != NULL) displayCalcul(valtmp, tmp2->val, tmp2->degree, '+');
+                                displayCalcul(valtmp, tmp2->val, tmp2->degree, '+');
                             #endif
                             val = add(valtmp, tmp2->val);
                             if (val == NULL) {free(valtmp); return NULL;}
                         }else{
                             #ifdef BONUS
-                                // if (tmp2 != NULL) displayCalcul(valtmp, tmp2->val, tmp2->degree, '-');
+                                displayCalcul(valtmp, tmp2->val, tmp2->degree, '-');
                             #endif
                             val = sub(valtmp, tmp2->val);
                             if (val == NULL) {free(valtmp); return NULL;}
