@@ -278,6 +278,7 @@ struct values *multiplicationAndDivisionData(struct values *data){
             int degree = tmp->prev->degree + tmp->next->degree;
             struct values *new = malloc(sizeof(struct values));
             if (new == NULL) {free(val); return NULL;}
+            initStructValues(new);
             new->side = tmp->side;
             new->sign = 0;
             new->degree = degree;
@@ -325,6 +326,7 @@ struct values *multiplicationAndDivisionData(struct values *data){
             if (val == NULL) return NULL;
             int degree = tmp->prev->degree - tmp->next->degree;
             struct values *new = malloc(sizeof(struct values));
+            initStructValues(new);
             if (new == NULL) {free(val); return NULL;}
             new->side = tmp->side;
             new->sign = 0;
@@ -426,6 +428,7 @@ struct values * additionAndSubtractionData(struct values *data){
                     if (val[0] == '-' && i == 0){
                         struct values *new = malloc(sizeof(struct values));
                         if (new == NULL){free(val); return NULL;}
+                        initStructValues(new);
                         new->degree = -1;
                         new->side = 0;
                         new->sign = 2;
@@ -440,6 +443,7 @@ struct values * additionAndSubtractionData(struct values *data){
                     else if (val[0] == '-' && tmp->prev->val[0] == '='){
                         struct values *new = malloc(sizeof(struct values));
                         if (new == NULL){free(val); return NULL;}
+                        initStructValues(new);
                         new->degree = -1;
                         new->side = 1;
                         new->sign = 2;
@@ -573,6 +577,7 @@ struct values * putDataOnLeftSide(struct values *data){
             struct values *tmp2 = tmp->next;
             struct values *new = malloc(sizeof(struct values));
             if (new == NULL) return NULL;
+            initStructValues(new);
             char *val = malloc(sizeof(char) * 2);
             if (val == NULL) {free(new); return NULL;}
             val[0] = '-';
