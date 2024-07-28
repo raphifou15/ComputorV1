@@ -499,10 +499,26 @@ struct values * additionAndSubtractionData(struct values *data){
     return data;
 }
 
+bool check_zero(char *str){
+    int point = 0;
+    for (unsigned long i = 0; str[i] != '\0'; i++){
+        if (str[i] == '.'){
+            if (point == 0){
+                point++;
+            }else{
+                return false;
+            }
+        }else if (str[i] != '0'){
+            return false;
+        }
+    }
+    return true;
+}
+
 struct values * supprimZeroOfData(struct values *data){
     struct values *tmp = data;
     while (tmp != NULL){
-        if (tmp->val[0] == '0' && tmp->prev == NULL){
+        if (check_zero(tmp->val) && tmp->prev == NULL){
             struct values *tmp2 = tmp;
             tmp = tmp->next;
             free(tmp2->val);
@@ -510,7 +526,7 @@ struct values * supprimZeroOfData(struct values *data){
             tmp->prev = NULL;
             data = tmp;
         }
-        else if (tmp->val[0] == '0' && tmp->prev->sign > 0 && tmp->prev->prev == NULL){
+        else if (check_zero(tmp->val) && tmp->prev->sign > 0 && tmp->prev->prev == NULL){
             struct values *tmp2 = tmp;
             tmp = tmp->next;
             if (tmp != NULL) tmp->prev = NULL;
@@ -520,7 +536,7 @@ struct values * supprimZeroOfData(struct values *data){
             free(tmp2);
             data = tmp;
         }
-        else if (tmp->val[0] == '0' && tmp->prev->sign > 0){
+        else if (check_zero(tmp->val) && tmp->prev->sign > 0){
             struct values *tmp2 = tmp;
             tmp = tmp->next;
             tmp2->prev->prev->next = tmp;
@@ -530,7 +546,7 @@ struct values * supprimZeroOfData(struct values *data){
             free(tmp2->val);
             free(tmp2);
         }
-        else if (tmp->val[0] == '0'){
+        else if (check_zero(tmp->val)){
             struct values *tmp2 = tmp;
             tmp = tmp->next;
             tmp2->prev->next = tmp;
@@ -1051,6 +1067,7 @@ void equation(char *s){
         temp = supprimZeroOfData(data);
         if (temp == NULL){freeData(data); return;}
         data = temp;
+        displayData(data);
     #endif
     // creer une fonction qui deduit le degrees de l'equation.
     int degree = degreeEquation(data);
