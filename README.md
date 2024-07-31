@@ -104,7 +104,7 @@ ou
 
 - Δ=b 2 −4ac
   En fonction de la valeur de Δ
-  Δ, nous avons différentes situations :
+- Δ, nous avons différentes situations :
   Si Δ > 0 : L'équation a deux solutions réelles distinctes.
   Si Δ = 0 : L'équation a une solution réelle double.
   Si Δ < 0 : L'équation n'a pas de solution réelle, mais deux solutions complexes conjugées.

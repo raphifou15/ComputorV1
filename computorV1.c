@@ -817,7 +817,7 @@ struct solucediv *solutionPositifSecondDegree(struct values *data, char *delta, 
     
     char *doublea = mul("2", vala);
     if (doublea == NULL){free(vala); free(valb); return NULL;}
-    char *rdelta = squareRoot(delta);
+    char *rdelta = squareRoot(delta, 0);
     if (rdelta == NULL){free(vala); free(valb);free(doublea);return NULL;}
     char *tmp2 = NULL;
     if (l == 1) tmp2 = sub(valb, rdelta);
@@ -827,11 +827,32 @@ struct solucediv *solutionPositifSecondDegree(struct values *data, char *delta, 
     if (soluce == NULL){free(vala); free(valb);free(doublea); free(rdelta); free(tmp2);return NULL;}
     char *fraction = divi(tmp2, doublea, true);
     if (fraction == NULL){free(vala); free(valb);free(doublea); free(rdelta); free(tmp2); free(soluce); return NULL;}
-    free(doublea); free(rdelta); free(tmp2);free(vala); free(valb);
+    free(rdelta); free(tmp2);free(vala);
     struct solucediv *s = malloc(sizeof(struct solucediv));
     if (s == NULL){free(soluce); free(fraction); return NULL;}
     s->soluce = soluce;
     s->fraction = fraction;
+    #ifdef BONUS
+    char *rdelta2 = squareRoot(delta, 1);
+    char *resBonus = NULL;
+    if (rdelta2 == NULL){
+        char *tmp2 = join("(", valb);
+        char *tmp3 = NULL;
+        if (l == 1) tmp3 = join(tmp2, " + √");
+        else tmp3 = join(tmp2, " - √");
+        char *tmp4 = join(tmp3, delta);
+        char *tmp5 = join(tmp4, ") / ");
+        char *resBonus = join(tmp5, doublea);
+        free(s->fraction);
+        s->fraction = resBonus;
+        free(tmp2);free(tmp3);free(tmp4);free(tmp5);
+        free(doublea);
+        free(valb);
+        return s;
+    }
+    #endif
+    free(doublea);
+    free(valb);
     return s;
 }
 
@@ -893,6 +914,7 @@ struct solucediv *solutionEqualZeroSecondDegree(struct values *data){
     if (s == NULL){free(soluce); free(fraction); return NULL;}
     s->soluce = soluce;
     s->fraction = fraction;
+
     return s;
 }
 
@@ -956,7 +978,8 @@ struct solucediv *solutionNegatifSecondDegree(struct values *data, char *delta, 
     }
     char *doublea = mul("2", vala);
     if (doublea == NULL){free(vala); free(valb); return NULL;}
-    char *rdelta = squareRoot(delta);
+    char *rdelta = squareRoot(delta, 0);
+    
     if (rdelta == NULL){free(vala); free(valb); free(doublea); return NULL;}
     char *div1 = divi(valb, doublea, false);
     if (div1 == NULL){free(vala); free(valb); free(doublea); free(rdelta); return NULL;}
@@ -1007,11 +1030,32 @@ struct solucediv *solutionNegatifSecondDegree(struct values *data, char *delta, 
             free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B);free(div2B); return NULL;
         }
     }
-    free(vala); free(valb); free(doublea); free(rdelta); free(div1); free(div2); free(div1B); free(div2B);
+    free(vala);  free(rdelta); free(div1); free(div2); free(div1B); free(div2B);
     struct solucediv *s = malloc(sizeof(struct solucediv));
     if (s == NULL){free(soluce);free(fraction);return NULL;}
     s->fraction = fraction;
-    s->soluce = soluce; 
+    s->soluce = soluce;
+    #ifdef BONUS
+    char *rdelta2 = squareRoot(delta, 1);
+    char *resBonus = NULL;
+    if (rdelta2 == NULL){
+        char *tmp2 = join("(",valb);
+        char *tmp3 = NULL;
+        if (l == 1) tmp3 = join(tmp2, " + i√");
+        else tmp3 = join(tmp2, " - i√");
+        char *tmp4 = join(tmp3, delta);
+        char *tmp5 = join(tmp4, ") / ");
+        char *resBonus = join(tmp5, doublea);
+        free(s->fraction);
+        s->fraction = resBonus;
+        free(tmp2);free(tmp3);free(tmp4);free(tmp5);
+        free(doublea);
+        free(valb);
+        
+        return s;
+    }
+    #endif
+    free(valb); free(doublea);
     return s;
 }
 

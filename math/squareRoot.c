@@ -44,7 +44,7 @@ static char *methodeHeron(char *val, char *s){
     return xn;
 }
 
-char *squareRoot(char *s){
+char *squareRoot(char *s, int flag){
     if (s[0] == '-') return NULL;
     char *val = add("0", "0");
     bool isFinnish = false;
@@ -54,6 +54,10 @@ char *squareRoot(char *s){
         free(power);
         if (num == 0)return val;
         else if (num > 0){
+            if (flag == 1){
+                free(val);
+                return NULL;
+            }
             char *nval = methodeHeron(val, s);
             free(val);
             val = nval;
