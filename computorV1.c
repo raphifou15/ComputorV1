@@ -1143,12 +1143,6 @@ void equation(char *s){
         }
         data = parseDataBonus(s);
         if (data == NULL) return;
-        // while (data != NULL){
-        //     printf("%s ",data->val);
-        //     data = data->next; 
-        // }
-        // printf("\n");
-        // return ;
     #endif
     
     // creer une fonction qui fait les multiplications de chaque coter.
@@ -1156,8 +1150,6 @@ void equation(char *s){
     temp = multiplicationAndDivisionData(data);
     if (temp == NULL){freeData(data); return ;}
     data = temp;
-    // displayData(data);
-    // return;
     // creer une fonction qui fait les additions et soustraction de chaque coter.
     temp = additionAndSubtractionData(data);
     if (temp == NULL){freeData(data); return;}
