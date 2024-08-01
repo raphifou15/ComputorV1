@@ -837,18 +837,35 @@ struct solucediv *solutionPositifSecondDegree(struct values *data, char *delta, 
     char *resBonus = NULL;
     if (rdelta2 == NULL){
         char *tmp2 = join("(", valb);
+        if (tmp2 == NULL){
+            free(s->fraction); free(s->soluce); free(s); free(valb); free(doublea); return NULL;
+        }
         char *tmp3 = NULL;
         if (l == 1) tmp3 = join(tmp2, " + √");
         else tmp3 = join(tmp2, " - √");
+        if (tmp3 == NULL){
+            free(s->fraction); free(s->soluce); free(s); free(tmp2); free(valb); free(doublea); return NULL;
+        }
         char *tmp4 = join(tmp3, delta);
+        if (tmp4 == NULL){
+            free(s->fraction); free(s->soluce); free(s); free(tmp3); free(tmp2); free(valb); free(doublea); return NULL;
+        }
         char *tmp5 = join(tmp4, ") / ");
+        if (tmp5 == NULL){
+            free(s->fraction); free(s->soluce); free(s); free(tmp4); free(tmp3); free(tmp2); free(valb); free(doublea); return NULL;
+        }
         char *resBonus = join(tmp5, doublea);
+        if (resBonus == NULL){
+            free(s->fraction); free(s->soluce); free(s); free(tmp5); free(tmp4); free(tmp3); free(tmp2); free(valb); free(doublea); return NULL;
+        }
         free(s->fraction);
         s->fraction = resBonus;
         free(tmp2);free(tmp3);free(tmp4);free(tmp5);
         free(doublea);
         free(valb);
         return s;
+    }else{
+        free(rdelta2);
     }
     #endif
     free(doublea);
@@ -1040,12 +1057,27 @@ struct solucediv *solutionNegatifSecondDegree(struct values *data, char *delta, 
     char *resBonus = NULL;
     if (rdelta2 == NULL){
         char *tmp2 = join("(",valb);
+        if (tmp2 == NULL){
+            free(s->fraction); free(s->soluce); free(s); free(valb); free(doublea); return NULL;
+        }
         char *tmp3 = NULL;
         if (l == 1) tmp3 = join(tmp2, " + i√");
         else tmp3 = join(tmp2, " - i√");
+        if (tmp3 == NULL){
+            free(s->fraction); free(s->soluce); free(s); free(tmp2); free(valb); free(doublea); return NULL;
+        }
         char *tmp4 = join(tmp3, delta);
+        if (tmp4 == NULL){
+            free(s->fraction); free(s->soluce); free(s); free(tmp3); free(tmp2); free(valb); free(doublea); return NULL;
+        }
         char *tmp5 = join(tmp4, ") / ");
+        if (tmp5 == NULL){
+            free(s->fraction); free(s->soluce); free(s); free(tmp4); free(tmp3); free(tmp2); free(valb); free(doublea); return NULL;
+        }
         char *resBonus = join(tmp5, doublea);
+        if (resBonus == NULL){
+            free(s->fraction); free(s->soluce); free(s); free(tmp5); free(tmp4); free(tmp3); free(tmp2); free(valb); free(doublea); return NULL;
+        }
         free(s->fraction);
         s->fraction = resBonus;
         free(tmp2);free(tmp3);free(tmp4);free(tmp5);
@@ -1053,10 +1085,45 @@ struct solucediv *solutionNegatifSecondDegree(struct values *data, char *delta, 
         free(valb);
         
         return s;
+    }else{
+        free(rdelta2);
     }
     #endif
     free(valb); free(doublea);
     return s;
+}
+
+struct values *suprimFloatEquation(struct values *data){
+    struct values *tmp = data;
+    long nbt = 0;
+    char *power = NULL;
+    while(tmp != NULL){
+        struct lenPointNumber lpn = strlenNumberPoint(tmp->val);
+        if (nbt < lpn.indexAPt) nbt = lpn.indexAPt;
+        tmp = tmp->next;
+    }
+    if (nbt == 0) return data;
+    nbt--;
+    power = mul("1", "1");
+    if (power == NULL) return NULL;
+    for (long i = 0; i < nbt; i++){
+        char *tmp2 = mul(power, "10");
+        free(power);
+        if (tmp2 == NULL) return NULL;
+        power = tmp2;
+    }
+    tmp = data;
+    while(tmp != NULL){
+        if (tmp->sign == 0 && (tmp->val[0] >= '0' && tmp->val[0] <= '9')){
+            char *tmp2 = mul(tmp->val, power);
+            if (tmp2 == NULL){free(power); return NULL;}
+            free(tmp->val);
+            tmp->val = tmp2;
+        }
+        tmp = tmp->next;
+    }
+    free(power);
+    return data;
 }
 
 void equation(char *s){
@@ -1114,6 +1181,8 @@ void equation(char *s){
         displayData(data);
     #endif
     // creer une fonction qui deduit le degrees de l'equation.
+    temp = suprimFloatEquation(data);
+    if (temp == NULL){freeData(data); return ;}
     int degree = degreeEquation(data);
     printf("Polynomial degree: %d\n", degree);
     if (degree > 2){
