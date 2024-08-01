@@ -16,11 +16,24 @@ struct values{
 void freeData(struct values *data);
 
 #ifdef BONUS
+
+struct divistruct{
+    char *numerator;
+    char *denominator;
+};
+
+struct sqrsim{
+    char *multiplicator;
+    char *squareRoot;
+};
+
+struct divistruct * simplificationDiv(char *nominator, char *denominator);
+struct sqrsim * simplification_squareRoot(char *val);
 void   bonusActivate(void);
 bool   isSyntaxErrorBonus(char *s);
 struct values * parseDataBonus(char *s);
-void  displayDataBonus(struct values *data, bool reduce);
-void displayCalcul(char *val1, char *val2, int degree, char sign);
+void    displayDataBonus(struct values *data, bool reduce);
+void    displayCalcul(char *val1, char *val2, int degree, char sign);
 #endif
 
 #endif

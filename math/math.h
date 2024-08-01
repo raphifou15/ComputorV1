@@ -26,6 +26,7 @@ bool    isOnlyNumber(char *s1);
 struct  lenPointNumber strlenNumberPoint(char *str);
 bool    isNumberFloat(char *str);
 char *  join(char *s1, char *s2);
+char *  joinTab(char **tab);
 void    decalValueOne(char *s);
 char    *decalValue(char *s, struct lenPointNumber lpns1, struct lenPointNumber lpns2);
 int     numberBigerLowerEqual(char *s1, char *s2);

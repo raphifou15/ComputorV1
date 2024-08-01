@@ -834,33 +834,75 @@ struct solucediv *solutionPositifSecondDegree(struct values *data, char *delta, 
     s->fraction = fraction;
     #ifdef BONUS
     char *rdelta2 = squareRoot(delta, 1);
-    char *resBonus = NULL;
     if (rdelta2 == NULL){
-        char *tmp2 = join("(", valb);
-        if (tmp2 == NULL){
-            free(s->fraction); free(s->soluce); free(s); free(valb); free(doublea); return NULL;
+        struct sqrsim *nsquareroot = simplification_squareRoot(delta);
+        struct divistruct *num1 = simplificationDiv(valb, doublea);
+        printf("num1->numerator = %s; num1->denominator = %s\n", num1->numerator, num1->denominator);
+        printf("valb = %s\n", valb);
+        // char *tmp2 = join("(", valb);
+        // char *tmp3 = NULL;
+        // if (l == 1) tmp3 = join(tmp2, " + √");
+        // else tmp3 = join(tmp2, " - √");
+        // char *tmp4 = join(tmp3, delta);
+        // char *tmp5 = join(tmp4, ") / ");
+        // char *resBonus = join(tmp5, doublea);
+        
+        char *resBonus = NULL;
+        if (l == 1){
+            if (nsquareroot->multiplicator != NULL){
+                struct divistruct *num2 = simplificationDiv(nsquareroot->multiplicator, doublea);
+
+                printf("num2->numerator = %s; num2->denominator = %s\n", num2->numerator, num2->denominator);
+                
+                if (num1 != NULL && num2 != NULL && strcmp(num1->denominator, num2->denominator) == 0){
+                    char *tab[] = {"(", num1->numerator, " + ",num2->numerator,"√", nsquareroot->squareRoot, ") / ", num1->denominator, NULL};
+                    resBonus = joinTab(tab);
+                    free(nsquareroot->multiplicator); free(nsquareroot->squareRoot); free(nsquareroot);
+                }else if(num1 != NULL && num2 != NULL && strcmp(num1->denominator, num2->denominator) != 0){
+                    char *tab[] = {"(", num1->numerator," / ", num1->denominator, ")", " + (",num2->numerator,"√", nsquareroot->squareRoot, ") / ", num2->denominator, NULL};
+                    resBonus = joinTab(tab);
+                    free(nsquareroot->multiplicator); free(nsquareroot->squareRoot); free(nsquareroot);
+                }
+                else{
+                    char *tab[] = {"(", valb, " + ",nsquareroot->multiplicator,"√", nsquareroot->squareRoot, ") / ", doublea, NULL};
+                    resBonus = joinTab(tab);
+                    free(nsquareroot->multiplicator); free(nsquareroot->squareRoot); free(nsquareroot);
+                }
+                
+            }else{
+                
+                char *tab[] = {"(", valb, " + √", delta, ") / ", doublea, NULL};
+                resBonus = joinTab(tab);
+            }
+            
         }
-        char *tmp3 = NULL;
-        if (l == 1) tmp3 = join(tmp2, " + √");
-        else tmp3 = join(tmp2, " - √");
-        if (tmp3 == NULL){
-            free(s->fraction); free(s->soluce); free(s); free(tmp2); free(valb); free(doublea); return NULL;
-        }
-        char *tmp4 = join(tmp3, delta);
-        if (tmp4 == NULL){
-            free(s->fraction); free(s->soluce); free(s); free(tmp3); free(tmp2); free(valb); free(doublea); return NULL;
-        }
-        char *tmp5 = join(tmp4, ") / ");
-        if (tmp5 == NULL){
-            free(s->fraction); free(s->soluce); free(s); free(tmp4); free(tmp3); free(tmp2); free(valb); free(doublea); return NULL;
-        }
-        char *resBonus = join(tmp5, doublea);
-        if (resBonus == NULL){
-            free(s->fraction); free(s->soluce); free(s); free(tmp5); free(tmp4); free(tmp3); free(tmp2); free(valb); free(doublea); return NULL;
+        else{
+            if (nsquareroot->multiplicator != NULL){
+                struct divistruct *num2 = simplificationDiv(nsquareroot->multiplicator, doublea);
+                printf("num2->numerator = %s; num2->denominator = %s\n", num2->numerator, num2->denominator);
+                if (num1 != NULL && num2 != NULL && strcmp(num1->denominator, num2->denominator) == 0){
+                    char *tab[] = {"(", num1->numerator, " - ",num2->numerator,"√", nsquareroot->squareRoot, ") / ", num1->denominator, NULL};
+                    resBonus = joinTab(tab);
+                    free(nsquareroot->multiplicator); free(nsquareroot->squareRoot); free(nsquareroot);
+                }else if(num1 != NULL && num2 != NULL && strcmp(num1->denominator, num2->denominator) != 0){
+                    char *tab[] = {"(", num1->numerator," / ", num1->denominator, ")", " - (",num2->numerator,"√", nsquareroot->squareRoot, ") / ", num2->denominator, NULL};
+                    resBonus = joinTab(tab);
+                    free(nsquareroot->multiplicator); free(nsquareroot->squareRoot); free(nsquareroot);
+                }
+                else{
+                    char *tab[] = {"(", valb, " - ",nsquareroot->multiplicator,"√", nsquareroot->squareRoot, ") / ", doublea, NULL};
+                    resBonus = joinTab(tab);
+                    free(nsquareroot->multiplicator); free(nsquareroot->squareRoot); free(nsquareroot);
+                }
+            }else{
+                char *tab[] = {"(", valb, " - √", delta, ") / ", doublea, NULL};
+                resBonus = joinTab(tab);
+            }
         }
         free(s->fraction);
+        
         s->fraction = resBonus;
-        free(tmp2);free(tmp3);free(tmp4);free(tmp5);
+        // free(tmp2);free(tmp3);free(tmp4);free(tmp5);
         free(doublea);
         free(valb);
         return s;
@@ -1056,6 +1098,7 @@ struct solucediv *solutionNegatifSecondDegree(struct values *data, char *delta, 
     char *rdelta2 = squareRoot(delta, 1);
     char *resBonus = NULL;
     if (rdelta2 == NULL){
+        simplification_squareRoot(delta);
         char *tmp2 = join("(",valb);
         if (tmp2 == NULL){
             free(s->fraction); free(s->soluce); free(s); free(valb); free(doublea); return NULL;
@@ -1135,7 +1178,6 @@ void equation(char *s){
     }
     data = parseData(s);
     if (data == NULL) return;
-
     #endif
     #ifdef BONUS
         if (isSyntaxErrorBonus(s) == false){
@@ -1144,7 +1186,6 @@ void equation(char *s){
         data = parseDataBonus(s);
         if (data == NULL) return;
     #endif
-    
     // creer une fonction qui fait les multiplications de chaque coter.
     struct values  *temp = NULL;
     temp = multiplicationAndDivisionData(data);

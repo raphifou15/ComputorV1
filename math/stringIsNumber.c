@@ -235,3 +235,23 @@ int numberBigerLowerEqual(char *s1, char *s2){
     else if(s1[i] > s2[i]) return 1;
     else return -1;
 }
+
+char * joinTab(char **tab){
+    size_t finalSize = 0;
+    for (int i = 0; tab[i] != NULL; i++){
+        size_t size = strlen(tab[i]);
+        finalSize += size;
+    }
+    char *str = malloc(sizeof(char) * finalSize + 1);
+    if (str == NULL)
+        return NULL;
+    str[finalSize] = '\0';
+    finalSize = 0;
+    for (int i = 0; tab[i] != NULL; i++){
+        for (int j = 0; tab[i][j] != '\0'; j++){
+            str[finalSize] = tab[i][j];
+            finalSize ++;
+        }
+    }
+    return str;
+}

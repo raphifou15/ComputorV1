@@ -404,3 +404,80 @@ struct values * parseDataBonus(char *s){
     }
     return data;
 }
+
+struct sqrsim * simplification_squareRoot(char *val){
+    char *tmp = divi(val, "2", false);
+    char *begin = NULL;
+    if(isNumberFloat(tmp)){
+        begin = sub(tmp, "0.5");free(tmp);
+    }else{
+        begin = tmp;
+    }
+    while (strcmp(begin, "1") != 0){
+        char *data = strdup("2");
+        char *carre = mul(begin, begin);
+        char *tmp2 = mul(carre, data);
+        int nbBLE = numberBigerLowerEqual(val, tmp2);
+        while (nbBLE > 0){
+            char *tmp3 = add(data, "1");
+            free(data);
+            data = tmp3;
+            free(tmp2);
+            tmp2 = mul(carre, data);
+            nbBLE = numberBigerLowerEqual(val, tmp2);
+        }
+        if (nbBLE == 0){
+            struct sqrsim *new = malloc(sizeof(struct sqrsim));
+            new->multiplicator = begin;
+            new->squareRoot = data;
+            free(tmp2);
+            free(carre);
+            return new;
+            // printf("begin = %s data = %s   val = %s, tmp2 = %s\n", begin, data, val, tmp2);
+        }
+        tmp = sub(begin, "1");
+        free(data);free(tmp2);free(begin);free(carre);
+        begin = tmp;
+    }
+    free(begin);
+    struct sqrsim *new = malloc(sizeof(struct sqrsim));
+    new->multiplicator = NULL;
+    new->squareRoot = strdup(val);
+    return new;
+}
+
+struct divistruct * simplificationDiv(char *numerator, char *denominator){
+    char *tmp = NULL;
+    char *tmp2 = NULL;
+    int res = numberBigerLowerEqual(numerator, denominator);
+    if (res > 0){
+        tmp = numerator;
+        tmp2 = denominator;
+    }else if (res < 0){
+        tmp = denominator;
+        tmp2 = numerator;
+    }else{
+        struct divistruct *s = malloc(sizeof(struct divistruct));
+        s->numerator = strdup("1");
+        s->denominator = strdup("1");
+        return s;
+    }
+    char *val = NULL;
+    if (tmp2[0] == '-') val = strdup(tmp2 + 1);
+    else val = strdup(tmp2);
+    while (strcmp(val, "1") != 0){
+        char *num1 = divi(numerator, val, false);
+        char *num2 = divi(denominator, val, false);
+        if (!isNumberFloat(num1) && !isNumberFloat(num2)){
+            struct divistruct *s = malloc(sizeof(struct divistruct));
+            s->numerator = num1;
+            s->denominator = num2;
+            return s;
+        }
+        free(num1); free(num2);
+        char *tmp3 = sub(val, "1");
+        free(val);
+        val = tmp3;
+    }
+    return NULL;
+}
