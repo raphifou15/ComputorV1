@@ -409,7 +409,8 @@ struct sqrsim * simplification_squareRoot(char *val){
     char *tmp = divi(val, "2", false);
     char *begin = NULL;
     if(isNumberFloat(tmp)){
-        begin = sub(tmp, "0.5");free(tmp);
+        begin = sub(tmp, "0.5");
+        free(tmp);
     }else{
         begin = tmp;
     }
@@ -433,7 +434,6 @@ struct sqrsim * simplification_squareRoot(char *val){
             free(tmp2);
             free(carre);
             return new;
-            // printf("begin = %s data = %s   val = %s, tmp2 = %s\n", begin, data, val, tmp2);
         }
         tmp = sub(begin, "1");
         free(data);free(tmp2);free(begin);free(carre);
@@ -458,6 +458,9 @@ struct divistruct * simplificationDiv(char *numerator, char *denominator){
         tmp2 = numerator;
     }else{
         struct divistruct *s = malloc(sizeof(struct divistruct));
+        if (s == NULL){
+            return NULL;
+        }
         s->numerator = strdup("1");
         s->denominator = strdup("1");
         return s;
@@ -465,13 +468,36 @@ struct divistruct * simplificationDiv(char *numerator, char *denominator){
     char *val = NULL;
     if (tmp2[0] == '-') val = strdup(tmp2 + 1);
     else val = strdup(tmp2);
+    if (val == NULL) return NULL;
     while (strcmp(val, "1") != 0){
         char *num1 = divi(numerator, val, false);
+        if (num1 == NULL) {free(val); return NULL;}
         char *num2 = divi(denominator, val, false);
         if (!isNumberFloat(num1) && !isNumberFloat(num2)){
             struct divistruct *s = malloc(sizeof(struct divistruct));
+            if (num1[0] == '-' && num2[0] == '-'){
+                char *tmp4 = mul(num1, "-1");
+                free(num1);
+                num1 = tmp4;
+                tmp4 = mul(num2, "-1");
+                free(num2);
+                num2 = tmp4;
+            }
+            if (strcmp(num2, "1") == 0){
+                free(num2);
+                num2 = NULL;
+            }else if(strcmp(num2, "-1") == 0){
+                char *tmp4 = mul(num1, "-1");
+                free(num1);
+                num1 = tmp4;
+            }
+            if(strcmp(num1, "0") == 0){
+                free(num2);
+                num2 = NULL;
+            }
             s->numerator = num1;
             s->denominator = num2;
+            free(val);
             return s;
         }
         free(num1); free(num2);
@@ -479,5 +505,6 @@ struct divistruct * simplificationDiv(char *numerator, char *denominator){
         free(val);
         val = tmp3;
     }
+    free(val);
     return NULL;
 }
