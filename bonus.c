@@ -407,28 +407,36 @@ struct values * parseDataBonus(char *s){
 
 struct sqrsim * simplification_squareRoot(char *val){
     char *tmp = divi(val, "2", false);
+    if (tmp == NULL) return NULL;
     char *begin = NULL;
     if(isNumberFloat(tmp)){
         begin = sub(tmp, "0.5");
+        if (begin == NULL) {free(tmp); return NULL;}
         free(tmp);
     }else{
         begin = tmp;
     }
     while (strcmp(begin, "1") != 0){
         char *data = strdup("2");
+        if (data == NULL){free(begin); return NULL;}
         char *carre = mul(begin, begin);
+        if (carre == NULL){free(data); free(begin); return NULL;}
         char *tmp2 = mul(carre, data);
+        if (tmp2 == NULL){free(carre);free(data); free(begin); return NULL;}
         int nbBLE = numberBigerLowerEqual(val, tmp2);
         while (nbBLE > 0){
             char *tmp3 = add(data, "1");
+            if (tmp3 == NULL){free(tmp2);free(carre);free(data); free(begin); return NULL;}
             free(data);
             data = tmp3;
             free(tmp2);
             tmp2 = mul(carre, data);
+            if (tmp2 == NULL){free(carre);free(data); free(begin); return NULL;}
             nbBLE = numberBigerLowerEqual(val, tmp2);
         }
         if (nbBLE == 0){
             struct sqrsim *new = malloc(sizeof(struct sqrsim));
+            if (new == NULL){free(tmp2);free(carre);free(data); free(begin); return NULL;}
             new->multiplicator = begin;
             new->squareRoot = data;
             free(tmp2);
@@ -437,74 +445,57 @@ struct sqrsim * simplification_squareRoot(char *val){
         }
         tmp = sub(begin, "1");
         free(data);free(tmp2);free(begin);free(carre);
+        if (tmp == NULL) return NULL;
         begin = tmp;
     }
     free(begin);
     struct sqrsim *new = malloc(sizeof(struct sqrsim));
+    if (new == NULL) return NULL;
     new->multiplicator = NULL;
     new->squareRoot = strdup(val);
     return new;
 }
 
 struct divistruct * simplificationDiv(char *numerator, char *denominator){
-    char *tmp = NULL;
-    char *tmp2 = NULL;
-    int res = numberBigerLowerEqual(numerator, denominator);
-    if (res > 0){
-        tmp = numerator;
-        tmp2 = denominator;
-    }else if (res < 0){
-        tmp = denominator;
-        tmp2 = numerator;
-    }else{
-        struct divistruct *s = malloc(sizeof(struct divistruct));
-        if (s == NULL){
-            return NULL;
-        }
-        s->numerator = strdup("1");
-        s->denominator = strdup("1");
-        return s;
+    char *a = strdup(numerator);
+    if (a == NULL) return NULL;
+    char *b = strdup(denominator);
+    if (b == NULL) {free(a); return NULL;}
+
+    while (strcmp(b , "0") != 0) {
+        char *temp2 = modulo(a, b);
+        if (temp2 == NULL){free(a); free(b); return NULL;}
+        free(a);
+        a = b;
+        b = temp2;
     }
-    char *val = NULL;
-    if (tmp2[0] == '-') val = strdup(tmp2 + 1);
-    else val = strdup(tmp2);
-    if (val == NULL) return NULL;
-    while (strcmp(val, "1") != 0){
-        char *num1 = divi(numerator, val, false);
-        if (num1 == NULL) {free(val); return NULL;}
-        char *num2 = divi(denominator, val, false);
-        if (!isNumberFloat(num1) && !isNumberFloat(num2)){
-            struct divistruct *s = malloc(sizeof(struct divistruct));
-            if (num1[0] == '-' && num2[0] == '-'){
-                char *tmp4 = mul(num1, "-1");
-                free(num1);
-                num1 = tmp4;
-                tmp4 = mul(num2, "-1");
-                free(num2);
-                num2 = tmp4;
-            }
-            if (strcmp(num2, "1") == 0){
-                free(num2);
-                num2 = NULL;
-            }else if(strcmp(num2, "-1") == 0){
-                char *tmp4 = mul(num1, "-1");
-                free(num1);
-                num1 = tmp4;
-            }
-            if(strcmp(num1, "0") == 0){
-                free(num2);
-                num2 = NULL;
-            }
-            s->numerator = num1;
-            s->denominator = num2;
-            free(val);
-            return s;
-        }
-        free(num1); free(num2);
-        char *tmp3 = sub(val, "1");
-        free(val);
-        val = tmp3;
+    free(b);
+    char *num1 = divi(numerator, a, false);
+    if (num1 == NULL){free(a); return NULL;}
+    char *num2 = divi(denominator, a, false);
+    free(a);
+    if (num2 == NULL){free(num1); return NULL;}
+    struct divistruct *s = malloc(sizeof(struct divistruct));
+    if (s == NULL){free(num1); free(num2); return NULL;}
+    if (num1[0] == '-' && num2[0] == '-'){
+        char *tmp = mul(num1, "-1");
+        free(num1);
+        num1 = tmp;
+        tmp = mul(num2, "-1");
+        free(num2);
+        num2 = tmp;
     }
-    free(val);
-    return NULL;
+    if (strcmp(num2, "1") == 0){
+        free(num2);
+        num2 = NULL;
+    }else if(strcmp(num2, "-1") == 0){
+        char *tmp = mul(num1, "-1");
+        free(num1);
+        num1 = tmp;
+        free(num2);
+        num2 = NULL;
+    }
+    s->numerator = num1;
+    s->denominator = num2;
+    return s;
 }

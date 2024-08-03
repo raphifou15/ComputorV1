@@ -841,7 +841,6 @@ struct solucediv *solutionPositifSecondDegree(struct values *data, char *delta, 
     s->fraction = fraction;
     #ifdef BONUS
     char *rdelta2 = squareRoot(delta, 1);
-    
     struct divistruct *num1 = simplificationDiv(valb, doublea);
     
     if (rdelta2 == NULL){
@@ -852,7 +851,7 @@ struct solucediv *solutionPositifSecondDegree(struct values *data, char *delta, 
         if (l == 1){
             if (nsquareroot->multiplicator != NULL){
                 struct divistruct *num2 = simplificationDiv(nsquareroot->multiplicator, doublea);
-                if (strcmp(num2->numerator, "1") == 0){
+                if (num2 != NULL && num2->numerator != NULL && strcmp(num2->numerator, "1") == 0){
                     free(num2->numerator);
                     num2->numerator = NULL;
                 }

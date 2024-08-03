@@ -16,6 +16,7 @@ SRC = add.c \
 	sub.c \
 	mul.c \
 	div.c \
+	modulo.c \
 	squareRoot.c \
 	stringIsNumber.c
 
